@@ -4,6 +4,7 @@ public class BTree {
 	BTreeNode myRoot;
 	long fileOffset;
 	File btreeFile;
+	int t; 	//degree
 
 	public BTree(){
 
@@ -22,7 +23,9 @@ public class BTree {
 	}
 
 	public boolean find(long sskey){		//true if the tree contains the element, can also return frequency instead
-
+		//TODO
+		System.out.println("Implement BTree foind()");
+		return false;
 	}
 
 
@@ -39,22 +42,39 @@ public class BTree {
 
 		}
 
+		private BTreeNode BTreeNode(long sskey) {
+			// TODO Auto-generated method stub
+			return null;
+		}
 
 		void insert(long sskey){
-			if(numChildren() == 2t-1){
+			if(BTreeNode(sskey).numChildren() == 2*t-1){
 				//split
 			}
 			if(numChildren() == 0){
 				insert(sskey);			//leaf
 			}
 
-			if(myparent != null){		//insertion sort #efficiency
+			if(myparent() != null){		//insertion sort #efficiency
 				//split by adding 1 new Node
 				//push median to parent
 				BTreeNode splitNode = createNode();
 			}
 
 		}
+
+
+		private Object myparent() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		private int numChildren() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+
 		public void setFileOffset(long fileOffset) {
 			// TODO Auto-generated method stub
 

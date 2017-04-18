@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class GeneBankCreateBTree {
 	
@@ -85,12 +88,24 @@ public class GeneBankCreateBTree {
 			printUsage();
 		}
 		
-		int inputType = Integer.parseInt(args[0]);
-		if(!(inputType == 1 || inputType == 2 || inputType == 3)) {
+		int degree = Integer.parseInt(args[0]);
+		if(degree < 0) {
 			throw new IllegalArgumentException("Improper Degree Selection");
 		}
 		
-		//TODO: check gbk file
+		//check gbk file
+		String filename = args[1];
+		String fileSuffix = filename.substring((filename.length()-4), filename.length());
+		File theFile = new File(filename);
+		if(!fileSuffix.equals(".gbk")) {	//make sure .gbk file
+			System.err.println("Wrong File Type.");
+			System.exit(1);		
+		}else if(!theFile.exists()) {
+			System.err.println("File not found.");
+			System.exit(1);
+		}
+			
+			
 		
 		int sequenceLength = Integer.parseInt(args[2]);
 		if(sequenceLength <= 0 ) {
@@ -106,6 +121,9 @@ public class GeneBankCreateBTree {
 		}
 		
 	}
+	
+	
+	
 	
 	/**
 	 * prints the proper command line arguments if the wrong inputs are detected

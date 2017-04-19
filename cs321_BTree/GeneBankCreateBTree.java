@@ -3,7 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class GeneBankCreateBTree {
-	
+	int sequenceLength;
 	/*
 	 * Usage:
 	 * java GeneBankCreateBTree <degree> <gbk file> <sequence length> [<debug level>]
@@ -26,10 +26,11 @@ public class GeneBankCreateBTree {
 	//what happens if we don't get a full 32 base number (16 bases?)
 	
 	
-	public static long stringToKey(String subsequence) {
+	public static long stringToKey(String subsequence, int sequenceLength) {
 		long theKey = 0;
 		subsequence.toLowerCase();
-		for (int i = 0; i < subsequence.length(); i += 1) {
+		int k = sequenceLength;
+		for (int i = 0; i < k; i += 1) {
 			//System.out.println(subsequence.substring(i, i+1));
 			long base = mapBase(subsequence.substring(i, i+1));
 			theKey = theKey | (base<<2*i);	//setbit
@@ -52,9 +53,10 @@ public class GeneBankCreateBTree {
 		}
 	}
 	
-	public static String keyToString(long theKey) {
+	public static String keyToString(long theKey, int sequenceLength) {
 		String theSequence = "";
-		for (int i = 0; i < 31; i += 1) {
+		int k = sequenceLength;
+		for (int i = 0; i < k; i += 1) {
 			//System.out.println(subsequence.substring(i, i+1));
 			//long base = mapBase(subsequence.substring(i, i+1));
 			long theBits = (theKey>>2*i) & (~(~0<<2));
@@ -109,7 +111,7 @@ public class GeneBankCreateBTree {
 		
 		int sequenceLength = Integer.parseInt(args[2]);
 		if(sequenceLength <= 0 ) {
-			throw new IllegalArgumentException("Improper Load Factor Specification");
+			throw new IllegalArgumentException("Improper Sequence Length Specification");
 		}
 		
 		int debugMode = 0;

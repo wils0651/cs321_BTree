@@ -1,23 +1,26 @@
-import java.util.Queue;
-import java.util.Scanner;
-import java.io.File;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Parser {
-	private File input;
+	private FileInputStream input;
 	private int sequenceLength;
-	private Scanner scan;
+	private DataInputStream data;
 	private boolean firstTime;
-	private Queue<Character> qla;
+	private BTLinkedList characterList;
+	private boolean hasMore;
 
-	public Parser(File input, int sequenceLength){
+	public Parser(FileInputStream input, int sequenceLength) throws FileNotFoundException{
 		this.input = input;
 		this.sequenceLength = sequenceLength;
-		scan = new Scanner(input);
+		data = new DataInputStream(input);
 		firstTime = true;
-		qla = new Queue<Character>();
+		characterList = new BTLinkedList(sequenceLength);
+		hasMore = true;
 	}
 	
-	public String nextSubSequence(){
+	public String nextSubSequence() throws IOException{
 		if (firstTime){
 			skipHeader();
 			firstTime = false;
@@ -25,34 +28,51 @@ public class Parser {
 		char g;
 		String ss;
 		
-		while(g gbf.getNext(gene)!= NULL){
-			qla.enqueue(g);
-			ss = qla.getSubsequence(sequenceLength);
+		if(data.available() == 1){
+			hasMore = false;
+		}
+		
+		while(data.available() > 0){
+			g = (char)data.readByte();
+			characterList.add(g);
+			ss = characterList.getSubsequence();
 			
-			if(ss.contains('N')){
-				for (int i = 0; i<k; i++){
-					qla.dequeue();
+			if(contains(ss,'N')){
+				for (int i = 0; i < sequenceLength; i++){
+					characterList.poll();
 				}
 			}
-			else if(ss.length == k){
-				qla.dequeue();
+			else if(ss.length() == sequenceLength){
+				characterList.poll();
 				return ss;
 			}
-			return ""; //not sure what to return if the next substring has an 'N'
 		}
+		return "";
 	}
 	
+	public boolean hasMore(){
+		return hasMore;
+	}
 
-	public void skipHeader(){
-		while(scan.hasNextByte()){
-			if(scan.nextByte() == 'O')
-				if(scan.nextByte() == 'R')
-					if(scan.nextByte() == 'I')
-						if(scan.nextByte() == 'G')
-							if(scan.nextByte() == 'I')
-								if(scan.nextByte() == 'N'){
+	public void skipHeader() throws IOException{
+		while(data.available() > 0){
+			if((char)data.readByte() == 'O')
+				if((char)data.readByte() == 'R')
+					if((char)data.readByte() == 'I')
+						if((char)data.readByte() == 'G')
+							if((char)data.readByte() == 'I')
+								if((char)data.readByte() == 'N'){
 									return;
 								}
 		}
+	}
+	
+	public boolean contains(String s, char find){
+		for(int i = 0; i < s.length(); i++){
+			if (s.charAt(i) == find){
+				return true;
+			}
+		}
+		return false;
 	}
 }

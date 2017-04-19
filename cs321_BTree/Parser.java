@@ -19,7 +19,7 @@ public class Parser {
 		characterList = new BTLinkedList(sequenceLength);
 		hasMore = true;
 	}
-	
+
 	public String nextSubSequence() throws IOException{
 		if (firstTime){
 			skipHeader();
@@ -27,18 +27,18 @@ public class Parser {
 		}
 		char g;
 		String ss;
-		
-		if(data.available() == 1){
+
+		if (data.available() == 0){
 			hasMore = false;
 		}
-		
+
 		while(data.available() > 0){
 			g = (char)data.readByte();
 			characterList.add(g);
 			ss = characterList.getSubsequence();
-			
-			if(contains(ss,'N')){
-				for (int i = 0; i < sequenceLength; i++){
+
+			if(contains(ss,'N') || contains(ss, ' ') || contains(ss, '/') || contains(ss, '\n')){
+				for (int i = 0; i < ss.length(); i++){
 					characterList.poll();
 				}
 			}
@@ -47,16 +47,23 @@ public class Parser {
 				return ss;
 			}
 		}
+
 		return "";
 	}
-	
+
+	public void printList(){
+		for (Character c: characterList){
+			System.out.println(c);
+		}
+	}
+
 	public boolean hasMore(){
 		return hasMore;
 	}
 
 	public void skipHeader() throws IOException{
 		while(data.available() > 0){
-			if((char)data.readByte() == 'O')
+			if((char)data.readByte() == 'O'){
 				if((char)data.readByte() == 'R')
 					if((char)data.readByte() == 'I')
 						if((char)data.readByte() == 'G')
@@ -64,6 +71,7 @@ public class Parser {
 								if((char)data.readByte() == 'N'){
 									return;
 								}
+			}
 
 
 
@@ -71,7 +79,7 @@ public class Parser {
 
 		}
 	}
-	
+
 	public boolean contains(String s, char find){
 		for(int i = 0; i < s.length(); i++){
 			if (s.charAt(i) == find){

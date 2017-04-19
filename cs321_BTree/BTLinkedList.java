@@ -12,8 +12,14 @@ private int sequenceLength;
 	public String getSubsequence(){
 		
 		String retval = "";
-		
-		for(int i = 0; i < sequenceLength; i++){
+		int size = 0;
+		if(this.size() < sequenceLength){
+			size = this.size();
+		}
+		else{
+			size = sequenceLength;
+		}
+		for(int i = 0; i < size; i++){
 			retval += this.get(i);
 		}
 		return retval;

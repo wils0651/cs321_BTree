@@ -1,10 +1,10 @@
-## B Tree Project
+# B Tree Project
 * Tyler Nicholls
 * Elijah Hill
 * Tim Wilson
 
 
-# Files / Classes / ? we will need:
+### Files / Classes / ? we will need:
 * GeneBankCreateBTree
 * GeneBankSearch
 * BTree

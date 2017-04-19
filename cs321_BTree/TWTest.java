@@ -1,3 +1,4 @@
+import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -6,8 +7,10 @@ public class TWTest {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		String testSequence = "actgaactg";
-		System.out.println("testSequence: "+testSequence);
-		long testKey = GeneBankCreateBTree.stringToKey(testSequence);
+		int k = 3;	//Sequence length
+		System.out.println("testSequence: "+testSequence + ", sequence length: " + k);
+
+		long testKey = GeneBankCreateBTree.stringToKey(testSequence, k);
 		System.out.println("testKey: "+Long.toBinaryString(testKey));
 		String returnedSeq = GeneBankCreateBTree.keyToString(testKey);
 		System.out.println("returnedSeq: " + returnedSeq);
@@ -23,9 +26,11 @@ public class TWTest {
 				System.out.println(s);
 			}
 		}
-		
+
+
+
+		String returnedSeq = GeneBankCreateBTree.keyToString(testKey, k);
+		System.out.println("returnedSeq: " + returnedSeq);
 
 	}
-
-
 }

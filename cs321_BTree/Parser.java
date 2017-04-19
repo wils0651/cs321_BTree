@@ -69,14 +69,10 @@ public class Parser {
 						if((char)data.readByte() == 'G')
 							if((char)data.readByte() == 'I')
 								if((char)data.readByte() == 'N'){
+
 									return;
 								}
 			}
-
-
-
-
-
 		}
 	}
 

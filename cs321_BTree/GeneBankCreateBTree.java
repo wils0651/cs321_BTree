@@ -120,6 +120,10 @@ public class GeneBankCreateBTree {
 			}
 		}
 		
+		//TODO: send file to parser
+		
+		//TODO: write to disk
+		
 	}
 	
 	

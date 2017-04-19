@@ -53,11 +53,6 @@ public class Parser {
 								if(scan.nextByte() == 'N'){
 									return;
 								}
-
-
-
-
-
 		}
 	}
 }

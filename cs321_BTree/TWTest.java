@@ -22,7 +22,7 @@ public class TWTest {
 		Parser aparse = new Parser(file, sequenceLength);
 		while(aparse.hasMore()){
 			String s = aparse.nextSubSequence();
-			if (s.length() == 3){
+			if (s.length() == sequenceLength){
 				System.out.println(s);
 			}
 		}

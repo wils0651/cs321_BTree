@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Scanner;
 
 public class GeneBankCreateBTree {
@@ -85,7 +87,7 @@ public class GeneBankCreateBTree {
 	
 	
 	
-	public static void main(String args[]) {
+	public static void main(String args[]) throws IOException {
 		if (args.length < 3) {
 			printUsage();
 		}
@@ -125,7 +127,14 @@ public class GeneBankCreateBTree {
 		//TODO: send file to parser
 		
 		//TODO: write to disk
+		File fakeFile = new File("FakeFileName");
+		String mode = "rw";			//read write
+		RandomAccessFile fileWriter = new RandomAccessFile(fakeFile, mode);
 		
+		//fileWriter.write(int b);	
+		//writeLong(long v)		//Writes a long to the file as eight bytes, high byte first.
+		fileWriter.read();		//readLong()
+		fileWriter.close();		//close the filewriter
 	}
 	
 	
@@ -151,6 +160,23 @@ public class GeneBankCreateBTree {
 			+ "(corresponding to the key stored) in an inorder traversal.\n"
 		);
 		System.exit(1);
+	}
+	
+	private void debugDump() {
+		/*
+		 * The program writes a text file named dump, that has the following line format:
+		 * <frequency> <DNA string>. The dump file contains frequency and DNA string
+		 * (corresponding to the key stored) in an inorder traversal.
+		 */
+		
+		//TODO: create a hashmap of sequences from and in-order traversal
+		
+	}
+	
+	private void bTreeDefaultSize() {
+		int sizeHeader = 100;	//bytes
+		int sizeObject = 40;	//bytes
+		
 	}
 	
 

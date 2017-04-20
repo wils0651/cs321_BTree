@@ -12,8 +12,8 @@ public class TWTest {
 
 		long testKey = GeneBankCreateBTree.stringToKey(testSequence, k);
 		System.out.println("testKey: "+Long.toBinaryString(testKey));
-		String returnedSeq = GeneBankCreateBTree.keyToString(testKey);
-		System.out.println("returnedSeq: " + returnedSeq);
+		//String returnedSeq = GeneBankCreateBTree.keyToString(testKey);
+		//System.out.println("returnedSeq: " + returnedSeq);
 
 
 		//Tyler's test

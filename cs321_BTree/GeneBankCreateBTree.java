@@ -126,8 +126,9 @@ public class GeneBankCreateBTree {
 		
 		//TODO: send file to parser
 		
-		//TODO: write to disk
-		File fakeFile = new File("FakeFileName");
+		//TODO: write to disk.
+		String theFilename = filename+".btree.data." + ""; //TODO: fix
+		File fakeFile = new File("xyz.gbk.btree.data.k.t.");
 		String mode = "rw";			//read write
 		RandomAccessFile fileWriter = new RandomAccessFile(fakeFile, mode);
 		

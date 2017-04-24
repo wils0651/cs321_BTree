@@ -1,4 +1,7 @@
+import sun.misc.Queue;
+
 import java.io.File;
+
 
 public class BTree {
 	BTreeNode myRoot;
@@ -6,8 +9,8 @@ public class BTree {
 	File btreeFile;
 	private int t;
 
-	public BTree(){
-
+	public BTree(int t){
+		this.t = t;
 	}
 
 	public void insert(long sskey){			//doesn't need to return anything but we can if we want!
@@ -26,10 +29,33 @@ public class BTree {
 		if(myRoot.contains(sskey)){
 			return true;
 		}
-
 		return false;
 	}
 
+	public void traverseTree(BTreeNode root) throws InterruptedException {
+		Queue q = new Queue<BTreeNode>();
+		q.enqueue(root);
+		traverseTreeRecursive(q);
+	}
+
+	public BTreeNode getRoot(){
+		return myRoot;
+	}
+
+	public void traverseTreeRecursive(Queue<BTreeNode> q) throws InterruptedException {
+		if (q.isEmpty()){
+			return;
+		}
+		BTreeNode node = q.dequeue();
+
+		System.out.println("[" + node.toString() + "]");
+
+		for (int i = 0; i < node.numChildren(); i++){
+			q.enqueue(node.getChildren()[i]);
+		}
+
+		traverseTreeRecursive(q);
+	}
 
 	public BTreeNode createNode(long sskey){
 		BTreeNode aNode = new BTreeNode();
@@ -56,25 +82,54 @@ public class BTree {
 
 
 		public void insert(long sskey){
-			if(numChildren() == 2*t-1){
-				//split
+			if(numChildren() == 2*t-1){					//logic for this taken from:    https://webdocs.cs.ualberta.ca/~holte/T26/ins-b-tree.html
+				keys[rear] = sskey;                     //adds key to array
+				insertionSort(keys, rear+1);       //sorts using insertion sort
+				int middleIndex = 1+(t-1)/2;           //middle index to be moved up
+				long removeKey = keys[middleIndex];
+				//overflow here
+
+				//Left:the first (M-1)/2 values
+				BTreeNode rightNode = createNode(middleIndex+1);   //moves half the elements to a new node
+				for(int i = middleIndex+2; i < rear; i++){
+					rightNode.insert(this.remove(i));
+				}
+				rightNode.setParent(myparent);
+
+				myparent.insert(removeKey);       //removes middle index from current node and adds it to parent
+												  //I think the parent's array will get sorted with it gets inserted...
+				//Middle: the middle value (position 1+((M-1)/2)
+				//Right: the last (M-1)/2 values
+
 			}
-			if(numChildren() == 0){
+			else if(numChildren() == 0){
 				keys[rear] = sskey;
+				insertionSort(keys, rear);
 				rear++;					//leaf
 			}
 
-			if(myparent != null){		//insertion sort #efficiency
-				//split by adding 1 new Node
-				//push median to parent
-				BTreeNode splitNode = createNode(sskey);
-				splitNode.insert(this.keys[rear/2]);    //shitty guess
-				splitNode.remove(this.keys[rear/2]);
+			else if(myparent != null){		//I don't really understand this condition
+				//BTreeNode splitNode = createNode(sskey);
+				//long middleIndex = 1+(t-1)/2;
+				//splitNode.insert(middleIndex);    //shitty guess remove the halfway element and make it the parent
+				//this.remove(middleIndex);
+				//this.setParent(splitNode);
+
 			}
 		}
 		public int numChildren(){
 			return childRear;
 		}
+
+		//public BTreeNode splitNode(long sskey){           //kinda inserts and splits
+		//	BTreeNode splitNode = createNode(sskey);
+		//	long middleIndex = 1+(t-1)/2;
+		//	splitNode.insert(middleIndex);    //shitty guess remove the halfway element and make it the parent
+		//	this.remove(middleIndex);
+		//	this.setParent(splitNode);
+
+//			return splitNode;
+//		}
 
 		public long remove(long key){
 			for(long i = this.keys[0]; i < this.keys[rear]; i++){
@@ -102,6 +157,7 @@ public class BTree {
 		
 		public void addChild(long key){
 			children[childRear] = createNode(key);
+			children[childRear].setParent(this);
 			childRear++;
 		}
 		
@@ -119,11 +175,30 @@ public class BTree {
 			return array;
 		}
 
+		public long[] getKeys(){
+			return keys;
+		}
+
+		public int getRear(){
+			return rear;
+		}
+
+		public void setRear(int rear){
+			this.rear = rear;
+		}
+
 		public void setFileOffset(long fileOffset) {
 			this.fileOffset = fileOffset;
 
 		}
 
+		public void setParent(BTreeNode parent){
+			this.myparent = parent;
+		}
+
+		public BTreeNode[] getChildren(){
+			return children;
+		}
 		public void writeNode() {
 			// TODO Auto-generated method stub
 
@@ -135,6 +210,18 @@ public class BTree {
 		public boolean childrenFull(){
 			return childRear == 2*t;
 		}
+
+		public String toString(){
+			String ss = "[";
+			for(int i = 0; i < rear-1; i++){
+				ss += keys[i] + ", ";
+			}
+			ss += keys[rear];
+			ss += "]";
+			return ss;
+		}
 	}
+
+
 
 }	

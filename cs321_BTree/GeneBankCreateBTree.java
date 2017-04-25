@@ -6,8 +6,8 @@ import java.io.RandomAccessFile;
 import java.util.Scanner;
 
 public class GeneBankCreateBTree {
-	private int sequenceLength;	//Length of each DNA sequence stored in the BTree
-	private int degree;	//Number of DNA sequences stored per BTreeNode
+	private int sequenceLength;	//Length of each DNA sequence stored in the BTree, k
+	private int degree;	//Number of DNA sequences stored per BTreeNode, t
 	/*
 	 * Usage:
 	 * java GeneBankCreateBTree <degree> <gbk file> <sequence length> [<debug level>]
@@ -75,24 +75,37 @@ public class GeneBankCreateBTree {
 		//TODO: send file to parser
 		FileInputStream theFileStream = new FileInputStream(theFile);
 		Parser gbkParser = new Parser(theFileStream, sequenceLength);
-		String testString = gbkParser.nextSubSequence();	//TODO: remove
-		System.out.println("testString: " + testString); 	//TODO: remove
-		long testBases = stringToKey(testString, sequenceLength); 	//TODO: remove
-		System.out.print("testBases: "+ testBases);
-		System.out.println(" in binary: "+Long.toBinaryString(testBases));
+		int countSeq = 0;
+		long elKey = 0;
+		
+		while(gbkParser.hasMore() && (countSeq < degree)) {
+			String testString = gbkParser.nextSubSequence();	//TODO: remove
+			System.out.print(countSeq);
+			System.out.print(", testString: " + testString); 	//TODO: remove
+			long testBases = stringToKey(testString, sequenceLength); 	//TODO: remove
+			//System.out.print("testBases: "+ testBases);
+			System.out.println(" in binary: "+Long.toBinaryString(testBases));
+			
+			elKey = elKey | (testBases<<2*sequenceLength*(countSeq+1));	//setbit
+			
+			countSeq++;
+		}
+		
+		//TODO: Put stuff into a Btree
+		
 		
 		
 		
 		//TODO: write to disk.
 		int k = sequenceLength;
 		int t = degree;
-		//String theFilename = filename+".btree.data." + k +"." +t;	//TODO: uncoment this
+		//String theFilename = filename+".btree.data." + k +"." +t;	//TODO: uncomment this
 		String theFilename = "theTestFile.txt";
 		File outputFile = new File(theFilename);
 		String mode = "rw";			//read write
 		RandomAccessFile fileWriter = new RandomAccessFile(outputFile, mode);
 		
-		fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
+		fileWriter.writeLong(elKey);		//Writes a long to the file as eight bytes, high byte first.
 		// to view file in console: xxd -b file
 		fileWriter.close();
 		
@@ -116,12 +129,15 @@ public class GeneBankCreateBTree {
 		
 		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
 		//fileReader.seek(0);
-		long readLong = fileReader.readLong();
-		System.out.println("readLong: "+readLong);
+		long elLong = fileReader.readLong();
+		System.out.println("elLong: "+elLong);
 		
-		fileReader.close();		//close the filewriter
+		fileReader.close();		//close the fileReader
 		
-		System.out.println("testing bases: " + keyToString(readLong, k));
+		for(int i = 0; i < degree; i++) {
+			long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
+			System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
+		}
 	}
 	
 	

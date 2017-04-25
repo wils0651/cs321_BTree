@@ -27,7 +27,6 @@ public class GeneBankCreateBTree {
 	 * (corresponding to the key stored) in an inorder traversal.
 	 */
 	public GeneBankCreateBTree(int degree, String filename, int sequenceLength) throws IOException{
-		
 		File theFile = new File(filename);
 		//TODO: send file to parser
 		FileInputStream theFileStream;

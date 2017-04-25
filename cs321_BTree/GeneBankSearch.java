@@ -1,7 +1,8 @@
 import java.io.File;
 
 public class GeneBankSearch {
-	private String filename;
+	private String bTreeFilename;
+	private String queryFilename;
 	private int debugMode;
 	
 	/*
@@ -15,8 +16,9 @@ public class GeneBankSearch {
 	 * 
 	 */
 	
-	public GeneBankSearch(String filename, int debugMode) {
-		this.filename = filename;
+	public GeneBankSearch(String bTreeFilename, String queryFilename, int debugMode) {
+		this.bTreeFilename = bTreeFilename;
+		this.queryFilename = queryFilename;
 		this.debugMode = debugMode;
 		
 	}
@@ -27,14 +29,21 @@ public class GeneBankSearch {
 		}
 
 		// Check <btree file>
-		String thisFilename = args[1];
-		File theFile = new File(thisFilename);
+		String thisBTreeFilename = args[0];
+		File theFile = new File(thisBTreeFilename);
 		if(!theFile.exists()) {
-			System.err.println("File not found.");
+			System.err.println("BTree file not found.");
 			System.exit(1);
 		}
 
 		// TODO: check <query file>
+		String thisQueryFilename = args[0];
+		File theQueryFile = new File(thisQueryFilename);
+		if(!theQueryFile.exists()) {
+			System.err.println("Query file not found.");
+			System.exit(1);
+		}
+		
 
 
 		int thisDebugMode = -1;
@@ -45,7 +54,7 @@ public class GeneBankSearch {
 			}
 		}
 		
-		GeneBankSearch gbs = new GeneBankSearch(thisFilename, thisDebugMode);
+		GeneBankSearch gbs = new GeneBankSearch(thisBTreeFilename, thisQueryFilename, thisDebugMode);
 	}
 	
 	

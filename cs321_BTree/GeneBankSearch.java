@@ -1,6 +1,9 @@
 import java.io.File;
 
 public class GeneBankSearch {
+	private String bTreeFilename;
+	private String queryFilename;
+	private int debugMode;
 	
 	/*
 	 * Usage:
@@ -12,6 +15,13 @@ public class GeneBankSearch {
 	 * error stream.
 	 * 
 	 */
+	
+	public GeneBankSearch(String bTreeFilename, String queryFilename, int debugMode) {
+		this.bTreeFilename = bTreeFilename;
+		this.queryFilename = queryFilename;
+		this.debugMode = debugMode;
+		
+	}
 
 	public static void main(String[] args) {
 		if (args.length < 2 || args.length < 4) {
@@ -19,23 +29,32 @@ public class GeneBankSearch {
 		}
 
 		// Check <btree file>
-		String filename = args[1];
-		File theFile = new File(filename);
+		String thisBTreeFilename = args[0];
+		File theFile = new File(thisBTreeFilename);
 		if(!theFile.exists()) {
-			System.err.println("File not found.");
+			System.err.println("BTree file not found.");
 			System.exit(1);
 		}
 
 		// TODO: check <query file>
+		String thisQueryFilename = args[0];
+		File theQueryFile = new File(thisQueryFilename);
+		if(!theQueryFile.exists()) {
+			System.err.println("Query file not found.");
+			System.exit(1);
+		}
+		
 
 
-		int debugMode;
+		int thisDebugMode = -1;
 		if (args.length > 2) {
-			debugMode = Integer.parseInt(args[2]);
-			if(!(debugMode == 0 || debugMode == 1)) {
+			thisDebugMode = Integer.parseInt(args[2]);
+			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {
 				throw new IllegalArgumentException("Improper Debug Mode Selection");
 			}
 		}
+		
+		GeneBankSearch gbs = new GeneBankSearch(thisBTreeFilename, thisQueryFilename, thisDebugMode);
 	}
 	
 	
@@ -43,11 +62,10 @@ public class GeneBankSearch {
 	 * prints the proper command line arguments if the wrong inputs are detected
 	 */
 	private static void printUsage() {
-		//TODO
 		System.out.println(
 			"Usage:\n"
 			+ " java GeneBankSearch <btree file> <query file> [<debug level>]\n"
-			+ " TODO"
+			+ "        TODO     \n"
 			+ " degree is the degree to be used for the BTree. If 0 is entered, the program will\n"
 			+ " choose the optimum degree based on a disk block size of 4096 bytes and the size\n"
 			+ " of the BTreeNode on disk\n"
@@ -62,10 +80,6 @@ public class GeneBankSearch {
 		);
 		System.exit(1);
 	}
-	
-	
-	
-	
 	
 	
 }

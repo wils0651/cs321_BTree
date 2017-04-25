@@ -24,7 +24,6 @@ public class GeneBankCreateBTree {
 	 * (corresponding to the key stored) in an inorder traversal.
 	*/
 	public GeneBankCreateBTree(){
-		
 	}
 	
 	

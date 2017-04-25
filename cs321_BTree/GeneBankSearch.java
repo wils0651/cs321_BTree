@@ -1,6 +1,8 @@
 import java.io.File;
 
 public class GeneBankSearch {
+	private String filename;
+	private int debugMode;
 	
 	/*
 	 * Usage:
@@ -12,6 +14,12 @@ public class GeneBankSearch {
 	 * error stream.
 	 * 
 	 */
+	
+	public GeneBankSearch(String filename, int debugMode) {
+		this.filename = filename;
+		this.debugMode = debugMode;
+		
+	}
 
 	public static void main(String[] args) {
 		if (args.length < 2 || args.length < 4) {
@@ -19,8 +27,8 @@ public class GeneBankSearch {
 		}
 
 		// Check <btree file>
-		String filename = args[1];
-		File theFile = new File(filename);
+		String thisFilename = args[1];
+		File theFile = new File(thisFilename);
 		if(!theFile.exists()) {
 			System.err.println("File not found.");
 			System.exit(1);
@@ -29,13 +37,15 @@ public class GeneBankSearch {
 		// TODO: check <query file>
 
 
-		int debugMode;
+		int thisDebugMode = -1;
 		if (args.length > 2) {
-			debugMode = Integer.parseInt(args[2]);
-			if(!(debugMode == 0 || debugMode == 1)) {
+			thisDebugMode = Integer.parseInt(args[2]);
+			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {
 				throw new IllegalArgumentException("Improper Debug Mode Selection");
 			}
 		}
+		
+		GeneBankSearch gbs = new GeneBankSearch(thisFilename, thisDebugMode);
 	}
 	
 	
@@ -43,11 +53,10 @@ public class GeneBankSearch {
 	 * prints the proper command line arguments if the wrong inputs are detected
 	 */
 	private static void printUsage() {
-		//TODO
 		System.out.println(
 			"Usage:\n"
 			+ " java GeneBankSearch <btree file> <query file> [<debug level>]\n"
-			+ " TODO"
+			+ "        TODO     \n"
 			+ " degree is the degree to be used for the BTree. If 0 is entered, the program will\n"
 			+ " choose the optimum degree based on a disk block size of 4096 bytes and the size\n"
 			+ " of the BTreeNode on disk\n"

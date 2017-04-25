@@ -76,22 +76,8 @@ public class GeneBankCreateBTree {
 		FileInputStream theFileStream = new FileInputStream(theFile);
 		Parser gbkParser = new Parser(theFileStream, sequenceLength);
 		int countSeq = 0;
-		long elKey = 0;
+		//long elKey = 0;
 		
-		while(gbkParser.hasMore() && (countSeq < degree)) {
-			String testString = gbkParser.nextSubSequence();	//TODO: remove
-			System.out.print(countSeq);
-			System.out.print(", testString: " + testString); 	//TODO: remove
-			long testBases = stringToKey(testString, sequenceLength); 	//TODO: remove
-			//System.out.print("testBases: "+ testBases);
-			System.out.println(" in binary: "+Long.toBinaryString(testBases));
-			
-			elKey = elKey | (testBases<<2*sequenceLength*(countSeq+1));	//setbit
-			
-			countSeq++;
-		}
-		
-		//TODO: Put stuff into a Btree
 		
 		
 		
@@ -105,7 +91,22 @@ public class GeneBankCreateBTree {
 		String mode = "rw";			//read write
 		RandomAccessFile fileWriter = new RandomAccessFile(outputFile, mode);
 		
-		fileWriter.writeLong(elKey);		//Writes a long to the file as eight bytes, high byte first.
+		while(gbkParser.hasMore() && (countSeq < degree)) {
+			String testString = gbkParser.nextSubSequence();	//TODO: remove
+			System.out.print(countSeq);
+			System.out.print(", testString: " + testString); 	//TODO: remove
+			long testBases = stringToKey(testString, sequenceLength); 	//TODO: remove
+			//System.out.print("testBases: "+ testBases);
+			System.out.println(" in binary: "+Long.toBinaryString(testBases));
+			
+			//elKey = elKey | (testBases<<2*sequenceLength*(countSeq+1));	//setbit
+			//fileWriter.writeLong(elKey);		//Writes a long to the file as eight bytes, high byte first.
+			fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
+			
+			countSeq++;
+		}
+		
+		//TODO: Put stuff into a Btree
 		// to view file in console: xxd -b file
 		fileWriter.close();
 		
@@ -129,15 +130,16 @@ public class GeneBankCreateBTree {
 		
 		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
 		//fileReader.seek(0);
-		long elLong = fileReader.readLong();
-		System.out.println("elLong: "+elLong);
 		
-		fileReader.close();		//close the fileReader
 		
 		for(int i = 0; i < degree; i++) {
-			long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
-			System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
+			long elLong = fileReader.readLong();
+			System.out.print("elLong: "+elLong);
+			//long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
+//			System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
+			System.out.println(", testing bases: " + keyToString(elLong, sequenceLength));
 		}
+		fileReader.close();		//close the fileReader
 	}
 	
 	

@@ -86,16 +86,15 @@ public class GeneBankCreateBTree {
 		//TODO: write to disk.
 		int k = sequenceLength;
 		int t = degree;
-		String theFilename = filename+".btree.data." + k +"." +t;
+		//String theFilename = filename+".btree.data." + k +"." +t;	//TODO: uncoment this
+		String theFilename = "theTestFile.txt";
 		File outputFile = new File(theFilename);
 		String mode = "rw";			//read write
 		RandomAccessFile fileWriter = new RandomAccessFile(outputFile, mode);
 		
-		//fileWriter.write(int b);	
 		fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
-		//fileWriter.write(byte[] b, int off, int len)
-		//fileWriter.read();		//readLong()
 		// to view file in console: xxd -b file
+		fileWriter.close();
 		
 		
 
@@ -114,11 +113,15 @@ public class GeneBankCreateBTree {
 //		//}
 		
 		
-//		int readLong = fileWriter.read();
-//		System.out.print("readLong: "+ readLong);
-//		System.out.println(" in binary: "+Long.toBinaryString(readLong));
 		
-		fileWriter.close();		//close the filewriter
+		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
+		//fileReader.seek(0);
+		long readLong = fileReader.readLong();
+		System.out.println("readLong: "+readLong);
+		
+		fileReader.close();		//close the filewriter
+		
+		System.out.println("testing bases: " + keyToString(readLong, k));
 	}
 	
 	

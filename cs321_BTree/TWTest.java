@@ -10,8 +10,8 @@ public class TWTest {
 		int k = 3;	//Sequence length
 		System.out.println("testSequence: "+testSequence + ", sequence length: " + k);
 
-		long testKey = GeneBankCreateBTree.stringToKey(testSequence, k);
-		System.out.println("testKey: "+Long.toBinaryString(testKey));
+		//long testKey = GeneBankCreateBTree.stringToKey(testSequence, k);
+		//System.out.println("testKey: "+Long.toBinaryString(testKey));
 		//String returnedSeq = GeneBankCreateBTree.keyToString(testKey);
 		//System.out.println("returnedSeq: " + returnedSeq);
 
@@ -29,8 +29,8 @@ public class TWTest {
 
 
 
-		String returnedSeq = GeneBankCreateBTree.keyToString(testKey, k);
-		System.out.println("returnedSeq: " + returnedSeq);
+		//String returnedSeq = GeneBankCreateBTree.keyToString(testKey, k);
+		//System.out.println("returnedSeq: " + returnedSeq);
 
 	}
 }

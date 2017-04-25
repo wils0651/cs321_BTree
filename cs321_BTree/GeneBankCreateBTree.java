@@ -6,8 +6,10 @@ import java.io.RandomAccessFile;
 import java.util.Scanner;
 
 public class GeneBankCreateBTree {
-	private int sequenceLength;	//Length of each DNA sequence stored in the BTree
-	private int degree;	//Number of DNA sequences stored per BTreeNode
+	private int sequenceLength;	//Length of each DNA sequence stored in the BTree, k
+	private int degree;	//Number of DNA sequences stored per BTreeNode, t
+	private static Parser gbkParser; //parser
+	
 	/*
 	 * Usage:
 	 * java GeneBankCreateBTree <degree> <gbk file> <sequence length> [<debug level>]
@@ -73,28 +75,41 @@ public class GeneBankCreateBTree {
 		
 		//TODO: send file to parser
 		FileInputStream theFileStream = new FileInputStream(theFile);
-		Parser gbkParser = new Parser(theFileStream, sequenceLength);
-		String testString = gbkParser.nextSubSequence();	//TODO: remove
-		System.out.println("testString: " + testString); 	//TODO: remove
-		long testBases = stringToKey(testString, sequenceLength); 	//TODO: remove
-		System.out.print("testBases: "+ testBases);
-		System.out.println(" in binary: "+Long.toBinaryString(testBases));
+		gbkParser = new Parser(theFileStream, sequenceLength);
+		int countSeq = 0;
+		//long elKey = 0;
+		
+		
 		
 		
 		
 		//TODO: write to disk.
 		int k = sequenceLength;
 		int t = degree;
-		String theFilename = filename+".btree.data." + k +"." +t;
+		//String theFilename = filename+".btree.data." + k +"." +t;	//TODO: uncomment this
+		String theFilename = "theTestFile.txt";
 		File outputFile = new File(theFilename);
 		String mode = "rw";			//read write
 		RandomAccessFile fileWriter = new RandomAccessFile(outputFile, mode);
 		
-		//fileWriter.write(int b);	
-		fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
-		//fileWriter.write(byte[] b, int off, int len)
-		//fileWriter.read();		//readLong()
+		while(gbkParser.hasMore() && (countSeq < degree)) {
+			String testString = gbkParser.nextSubSequence();	//TODO: remove
+			System.out.print(countSeq);
+			System.out.print(", testString: " + testString); 	//TODO: remove
+			long testBases = gbkParser.stringToKey(testString, sequenceLength); 	//TODO: remove
+			//System.out.print("testBases: "+ testBases);
+			System.out.println(" in binary: "+Long.toBinaryString(testBases));
+			
+			//elKey = elKey | (testBases<<2*sequenceLength*(countSeq+1));	//setbit
+			//fileWriter.writeLong(elKey);		//Writes a long to the file as eight bytes, high byte first.
+			fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
+			
+			countSeq++;
+		}
+		
+		//TODO: Put stuff into a Btree
 		// to view file in console: xxd -b file
+		fileWriter.close();
 		
 		
 
@@ -113,93 +128,22 @@ public class GeneBankCreateBTree {
 //		//}
 		
 		
-//		int readLong = fileWriter.read();
-//		System.out.print("readLong: "+ readLong);
-//		System.out.println(" in binary: "+Long.toBinaryString(readLong));
 		
-		fileWriter.close();		//close the filewriter
-	}
-	
-	
-	/**
-	 * converts a string of letter DNA bases to a number
-	 * @param subsequence
-	 * @param sequenceLength
-	 * @return a long that represents the sequence
-	 */
-	public static long stringToKey(String subsequence, int sequenceLength) {
-		long theKey = 0;
-		subsequence.toLowerCase();
-		int k = sequenceLength;
-		for (int i = 0; i < k; i += 1) {
-			//System.out.println(subsequence.substring(i, i+1));
-			long base = mapBase(subsequence.substring(i, i+1));
-			theKey = theKey | (base<<2*i);	//setbit
+		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
+		//fileReader.seek(0);
+		
+		
+		for(int i = 0; i < degree; i++) {
+			long elLong = fileReader.readLong();
+			System.out.print("elLong: "+elLong);
+			//long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
+//			System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
+			System.out.println(", testing bases: " + gbkParser.keyToString(elLong, sequenceLength));
 		}
-		return theKey;
-	}
-	
-	/**
-	 * helper method that converts a letter DNA base to a two digit binary number
-	 * @param theBase
-	 * @return base as a number
-	 */
-	private static long mapBase(String theBase) {
-		if( theBase.equals("a") ) {
-			return 0b00;
-		} else if (theBase.equals("t")) {
-			return 0b11;
-		} else if (theBase.equals("c")) {
-			return 0b01;
-		} else if (theBase.equals("g")) {
-			return 0b10;
-		} else {
-			System.err.println("mapBase Error");
-			return -1;
-		}
-	}
-	
-	/**
-	 * Converts a binary number of DNA bases to a sting of letters 
-	 * @param theKey
-	 * @param sequenceLength
-	 * @return
-	 */
-	public static String keyToString(long theKey, int sequenceLength) {
-		String theSequence = "";
-		int k = sequenceLength;
-		for (int i = 0; i < k; i += 1) {
-			//System.out.println(subsequence.substring(i, i+1));
-			//long base = mapBase(subsequence.substring(i, i+1));
-			long theBits = (theKey>>2*i) & (~(~0<<2));
-			//System.out.println("i: " + i + ", theBits: " + Long.toBinaryString(theBits));
-			String base = mapKey(theBits);
-			theSequence += base;
-		}
-		return theSequence;
+		fileReader.close();		//close the fileReader
 	}
 	
 	
-	/**
-	 * private helper method to convert a two binary digit number to the appropriate 
-	 * DNA base 
-	 * @param twoDigit
-	 * @return DNA base
-	 */
-	public static String mapKey(long twoDigit) {
-		if( twoDigit ==  0b00) {
-			return "a";	//a
-		} else if (twoDigit == 0b11) {
-			return "t";	//t
-		} else if (twoDigit == 0b01) {
-			return "c";	//c 
-		} else if (twoDigit == 0b10) {
-			return "g";	//g
-		} else {
-			System.err.println("mapBase Error");
-			return "error";
-		}
-	}
 	
 	
 	/**
@@ -253,6 +197,8 @@ public class GeneBankCreateBTree {
 		int numObjects = (sizeBlock - sizeParent + sizeObject - sizeHeader)/(2*sizeChild + 2*sizeObject);
 		return numObjects;
 	}
+	
+	
 	
 
 }

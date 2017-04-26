@@ -14,6 +14,8 @@ public class GeneBankSearch {
 	 * diagnostic messages, help and status messages must be be printed on standard
 	 * error stream.
 	 * 
+	 * 
+	 * The search returns the frequency of occurrence of the query string
 	 */
 	
 	public GeneBankSearch(String bTreeFilename, String queryFilename, int debugMode) {
@@ -36,7 +38,7 @@ public class GeneBankSearch {
 			System.exit(1);
 		}
 
-		// TODO: check <query file>
+		//check <query file>
 		String thisQueryFilename = args[0];
 		File theQueryFile = new File(thisQueryFilename);
 		if(!theQueryFile.exists()) {

@@ -11,6 +11,7 @@ public class GeneBankCreateBTree {
 	private int degree;	//Number of DNA sequences stored per BTreeNode, t
 	private Parser gbkParser; //parser
 	private String filename;
+	private BTree theBTree;
 
 	/*
 	 * Usage:
@@ -31,6 +32,8 @@ public class GeneBankCreateBTree {
 		this.degree = degree;
 		this.filename = filename;
 		this.sequenceLength = sequenceLength;
+		
+		theBTree = new BTree(degree);
 
 	}
 
@@ -82,7 +85,7 @@ public class GeneBankCreateBTree {
 
 		//TODO: Put stuff into a Btree
 
-		gbcbt.testWrite();
+		//gbcbt.testWrite();
 
 	}
 
@@ -186,7 +189,7 @@ public class GeneBankCreateBTree {
 
 	}
 
-	public void sendToParser() {
+	public void sendToParser() throws IOException {
 		File theFile = new File(filename);
 		//TODO: send file to parser
 		FileInputStream theFileStream;
@@ -197,10 +200,41 @@ public class GeneBankCreateBTree {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		long nextKey;
+		while(gbkParser.hasMore() ) {
+			//String testString = gbkParser.nextSubSequence();	//TODO: remove
+			//System.out.print(countSeq);
+			//System.out.print(", testString: " + testString); 	//TODO: remove
+			//long testBases = gbkParser.stringToKey(testString, sequenceLength); 	//TODO: remove
+			//System.out.println(" in binary: "+Long.toBinaryString(testBases));
+			nextKey = gbkParser.getNextKey();
+			System.out.println(gbkParser.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
+			theBTree.insert(gbkParser.getNextKey());
+		}
+		
+		
 	}
 
 
+	/**
+	 * test method
+	 * @throws IOException
+	 */
 	public void testWrite() throws IOException {
+		//TODO: delete this method
+		
+		File theFile = new File(filename);
+		//TODO: send file to parser
+		FileInputStream theFileStream;
+		try {
+			theFileStream = new FileInputStream(theFile);
+			gbkParser = new Parser(theFileStream, sequenceLength);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		//TODO: write to disk.
 		//int k = sequenceLength;
 		//int t = degree;
@@ -211,9 +245,10 @@ public class GeneBankCreateBTree {
 		RandomAccessFile fileWriter;
 		fileWriter = new RandomAccessFile(outputFile, mode);
 
+		int maxCount = 20;
 		int countSeq = 0;
 
-		while(gbkParser.hasMore() && (countSeq < degree)) {
+		while(gbkParser.hasMore() && (countSeq < maxCount)) {
 			String testString = gbkParser.nextSubSequence();	//TODO: remove
 			System.out.print(countSeq);
 			System.out.print(", testString: " + testString); 	//TODO: remove
@@ -226,15 +261,13 @@ public class GeneBankCreateBTree {
 			countSeq++;
 		}
 
-
-
 		// to view file in console: xxd -b file
 		fileWriter.close();
 
 		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
-		//fileReader.seek(0);
+		fileReader.seek(8);
 
-		for(int i = 0; i < degree; i++) {
+		for(int i = 0; i < maxCount/2; i++) {
 			long elLong = fileReader.readLong();
 			//TODO: use readbyte with offset
 			System.out.print("elLong: "+elLong);

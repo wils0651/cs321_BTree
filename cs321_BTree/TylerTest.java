@@ -17,7 +17,11 @@ public class TylerTest {
         tylerTree.insert(7);
         
         while(true) {
+<<<<<<< HEAD
             System.out.println("Enter a number to add to your tree, Michael");
+=======
+            System.out.println("Enter a number to add to your tree, Tyler");
+>>>>>>> 5e55c15906a5e6326ca76a56ed54ff2aab01438d
             long treeInsert = scan.nextLong();
             tylerTree.insert(treeInsert);
             tylerTree.traverseTree(tylerTree.getRoot());

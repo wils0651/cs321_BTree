@@ -25,8 +25,10 @@ public class Parser {
 			skipHeader();
 			firstTime = false;
 		}
+		
 		char g;
 		String ss;
+		
 
 		if (data.available() == 0){
 			hasMore = false;
@@ -36,8 +38,18 @@ public class Parser {
 			g = (char)data.readByte();
 			characterList.add(g);
 			ss = characterList.getSubsequence();
+			
+			//TODO: fix this
+			if(contains(ss, '/')) {
+				characterList.poll();
+				if(contains(ss, '/')) {
+					skipHeader();
+				}
+			}
 
-			if(contains(ss,'N') || contains(ss, ' ') || contains(ss, '/') || contains(ss, '\n')){
+			//if(contains(ss,'N') || contains(ss, ' ') || contains(ss, '/') || contains(ss, '\n')){
+			if(contains(ss,'N') || contains(ss, ' ') || contains(ss, '\n') ){
+				//TODO: skip for numbers
 				for (int i = 0; i < ss.length(); i++){
 					characterList.poll();
 				}
@@ -89,9 +101,8 @@ public class Parser {
 	/**
 	 * method to return the next sub sequence as a long
 	 */
-	public long getKey() throws IOException {
+	public long getNextKey() throws IOException {
 		return stringToKey( nextSubSequence(), sequenceLength );
-		
 	}
 	
 	/**
@@ -127,7 +138,7 @@ public class Parser {
 		} else if (theBase.equals("g")) {
 			return 0b10;
 		} else {
-			System.err.println("mapBase Error");
+			System.err.println("mapBase Error: " + theBase);
 			return -1;
 		}
 	}
@@ -159,7 +170,7 @@ public class Parser {
 	 * @param twoDigit
 	 * @return DNA base
 	 */
-	public String mapKey(long twoDigit) {
+	private String mapKey(long twoDigit) {
 		if( twoDigit ==  0b00) {
 			return "a";	//a
 		} else if (twoDigit == 0b11) {

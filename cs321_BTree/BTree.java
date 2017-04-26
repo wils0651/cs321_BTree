@@ -117,10 +117,11 @@ public class BTree {
 				myparent.addChild(rightNode);
 				
 				BTreeNode addNode = null;
-				while((addNode = removeChild(removeValue)) != null){
+				while((addNode = removeChild(middleValue)) != null){
 					rightNode.addChild(addNode);
+					addNode.setParent(rightNode);
 				}
-				rightNode.childrenSort();
+				
 				
 				if(sskey <= middleValue){
 					insert(sskey);
@@ -128,6 +129,9 @@ public class BTree {
 				else{
 					rightNode.insert(sskey);
 				}
+				rightNode.childrenSort();
+				childrenSort();
+				myparent.childrenSort();
 				myRoot.childrenSort();
 
 			}
@@ -204,12 +208,13 @@ public class BTree {
 		public BTreeNode removeChild(long key){
 			BTreeNode retval = null;
 			boolean canSwitch = false;
-			for(int i = 0; i < childRear-1; i++){
-				if(children[i].getKeys()[0] > key){
+			for(int i = 0; i < childRear; i++){
+				if(children[i].getKeys()[0] > key && !canSwitch){
 					retval = children[i];
 					canSwitch = true;
+					System.out.println("addNodes");
 				}
-				if(canSwitch){
+				if(canSwitch && i < 2*t-1){
 					children[i] = children[i+1];
 				}
 			}

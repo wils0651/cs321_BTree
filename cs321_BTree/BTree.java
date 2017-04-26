@@ -264,6 +264,10 @@ public class BTree {
 		public void setRear(int rear){
 			this.rear = rear;
 		}
+		
+		public long getFileOffset() {
+			return fileOffset;
+		}
 
 		public void setFileOffset(long fileOffset) {
 			this.fileOffset = fileOffset;
@@ -281,14 +285,14 @@ public class BTree {
 			// TODO design file format
 			//String theFilename = "theTestFile.txt";
 			//File outputFile = new File(theFilename);
-			String mode = "rw";			//read write
+			String mode = "w";			//rw is read write
 			RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
 			fileWriter.seek(fileOffset);
 			for(int i = 0; i < 2*t-1; i += 1) {
 				fileWriter.writeLong(keys[i]);		//Writes a long to the file as eight bytes, high byte first.
 			}
 			for(int i = 0; i < 2*t; i += 1) {
-				//fileWriter.writeLong(children[i].getOffset);		//Writes a long to the file as eight bytes, high byte first.
+				fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
 			}
 			fileWriter.close();
 

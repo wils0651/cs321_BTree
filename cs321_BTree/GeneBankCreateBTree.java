@@ -81,11 +81,11 @@ public class GeneBankCreateBTree {
 		//Create an oblect
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
 
-		//gbcbt.sendToParser();
+		gbcbt.sendToParser();
 
 		//TODO: Put stuff into a Btree
 
-		gbcbt.testWrite();
+		//gbcbt.testWrite();
 
 	}
 

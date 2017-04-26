@@ -21,7 +21,7 @@ public class BTree {
 			//myRoot.writeNode();
 		}
 
-		myRoot.insert(sskey);
+		myRoot.insert(new BTreeObject(sskey));
 
 	}
 
@@ -30,7 +30,7 @@ public class BTree {
 	}
 
 	public boolean find(long sskey){		//true if the tree contains the element, can also return frequency instead
-		if(myRoot.contains(sskey)){
+		if(myRoot.contains(sskey) != null){
 			return true;
 		}
 		return false;
@@ -57,7 +57,7 @@ public class BTree {
 		traverseTreeRecursive(q);
 	}
 
-	public BTreeNode createNode(long sskey){
+	public BTreeNode createNode(BTreeObject sskey){
 		BTreeNode aNode = new BTreeNode();
 		aNode.insert(sskey);
 		//	fileOffset = btreeFile.length();
@@ -68,7 +68,7 @@ public class BTree {
 
 	public class BTreeNode{
 		private BTreeNode myparent;
-		private long[] keys;
+		private BTreeObject[] keys;
 		private BTreeNode[] children;
 		private int rear;
 		private int childRear;
@@ -76,26 +76,26 @@ public class BTree {
 		private boolean splitInsert;
 
 		public BTreeNode(){				//constructor
-			keys = new long[2*t-1];
+			keys = new BTreeObject[2*t-1];
 			children = new BTreeNode[2*t];
 			rear = 0;
 			childRear = 0;
 			myparent = null;
 			splitInsert = false;
 		}
+		
 
-
-		public void insert(long sskey){
+		public void insert(BTreeObject sskey){
 			if(rear == 2*t-1){					//logic for this taken from:    https://webdocs.cs.ualberta.ca/~holte/T26/ins-b-tree.html
 				int middleIndex = 1+(t-1)/2;			//middle index to be moved up
-				long middleValue = keys[middleIndex];
+				long middleValue = keys[middleIndex].key;
 				if(myRoot != this){
-					long removeKey = remove(middleIndex);
+					BTreeObject removeKey = remove(middleIndex);
 					myparent.setSplitInsert(true);
 					myparent.insert(removeKey);
 				}
 				else{
-					long removeKey = keys[middleIndex];	
+					BTreeObject removeKey = keys[middleIndex];	
 					remove(middleIndex);
 					BTreeNode splitNode = createNode(removeKey);
 					myRoot = splitNode;
@@ -104,26 +104,26 @@ public class BTree {
 				}
 
 
-				long removeValue = remove(middleIndex);
-				BTreeNode rightNode = createNode(removeValue);   //moves half the elements to a new node
+				BTreeObject removeObject = remove(middleIndex);
+				BTreeNode rightNode = createNode(removeObject);   //moves half the elements to a new node
 				//				for(int i = middleIndex; i < rear; i++){
 				//					rightNode.insert(remove(i));
 				//				}
-				while(keys[middleIndex] != 0){
+				while(keys[middleIndex] != null){
 					rightNode.insert(remove(middleIndex));
 				}
 
 				rightNode.setParent(myparent);
 				myparent.addChild(rightNode);
-				
+
 				BTreeNode addNode = null;
 				while((addNode = removeChild(middleValue)) != null){
 					rightNode.addChild(addNode);
 					addNode.setParent(rightNode);
 				}
-				
-				
-				if(sskey <= middleValue){
+
+
+				if(sskey.key <= middleValue){
 					insert(sskey);
 				}
 				else{
@@ -136,24 +136,31 @@ public class BTree {
 
 			}
 			else if(numChildren() == 0 || splitInsert){
-				keys[rear] = sskey;
-				rear++;					//leaf
-				if (rear > 1){
-					insertionSort(keys, rear);
-				}
-				splitInsert = false;
+				BTreeObject duplicate = contains(sskey.key);
 
+				if(duplicate != null){
+					duplicate.incrementFreq();
+				}
+				else{
+					keys[rear] = sskey;
+					rear++;
+					//leaf
+					if (rear > 1){
+						insertionSort(keys, rear);
+					}
+					splitInsert = false;
+				}
 			}
 			else{
-				if(keys[0] > sskey){
+				if(keys[0].key > sskey.key){
 					children[0].insert(sskey);
 				}
-				else if(keys[rear-1] < sskey){
+				else if(keys[rear-1].key < sskey.key){
 					children[childRear-1].insert(sskey);
 				}
 				else{
 					for(int i = 0; i < rear-1; i++){
-						if(keys[i] <= sskey && keys[i+1] > sskey){
+						if(keys[i].key <= sskey.key && keys[i+1].key > sskey.key){
 							children[i+1].insert(sskey);
 							return;
 						}
@@ -175,8 +182,8 @@ public class BTree {
 			return childRear;
 		}
 
-		public long remove(int index){
-			long retval = 0;
+		public BTreeObject remove(int index){
+			BTreeObject retval = null;
 			if(rear - 1 == index){
 				retval = keys[index];
 			}
@@ -186,17 +193,17 @@ public class BTree {
 				keys[index] = keys[index+1];
 			}
 			rear--;
-			keys[rear] = 0;
+			keys[rear] = null;
 			return retval;
 		}
 
-		public boolean contains(long key){
-			for(long i = this.keys[0]; i < this.keys[rear]; i+=1){
-				if(keys[(int) i] == key){
-					return true;
+		public BTreeObject contains(long key){
+			for(int i = 0; i < rear; i++){
+				if(keys[i].key == key){
+					return keys[i];
 				}
 			}
-			return false;
+			return null;
 		}
 
 		public void addChild(BTreeNode child){
@@ -204,15 +211,14 @@ public class BTree {
 			children[childRear].setParent(this);
 			childRear++;
 		}
-		
+
 		public BTreeNode removeChild(long key){
 			BTreeNode retval = null;
 			boolean canSwitch = false;
 			for(int i = 0; i < childRear; i++){
-				if(children[i].getKeys()[0] > key && !canSwitch){
+				if(children[i].getKeys()[0].key > key && !canSwitch){
 					retval = children[i];
 					canSwitch = true;
-					System.out.println("addNodes");
 				}
 				if(canSwitch && i < 2*t-1){
 					children[i] = children[i+1];
@@ -227,7 +233,7 @@ public class BTree {
 		public void childrenSort(){
 			for (int i = 0; i < childRear; i++){
 				int j = i;
-				while(j > 0 && children[j-1].getKeys()[0] > children[j].getKeys()[0]){
+				while(j > 0 && children[j-1].getKeys()[0].key > children[j].getKeys()[0].key){
 					BTreeNode temp = children[j];
 					children[j] = children[j-1];
 					children[j-1] = temp;
@@ -236,11 +242,11 @@ public class BTree {
 			}
 		}
 
-		public long[] insertionSort(long[] array, int arrayRear){
+		public BTreeObject[] insertionSort(BTreeObject[] array, int arrayRear){
 			for (int i = 0; i < arrayRear; i++){
 				int j = i;
-				while(j > 0 && array[j-1] > array[j]){
-					long temp = array[j];
+				while(j > 0 && array[j-1].key > array[j].key){
+					BTreeObject temp = array[j];
 					array[j] = array[j-1];
 					array[j-1] = temp;
 					j = j - 1;
@@ -250,7 +256,7 @@ public class BTree {
 			return array;
 		}
 
-		public long[] getKeys(){
+		public BTreeObject[] getKeys(){
 			return keys;
 		}
 
@@ -285,7 +291,7 @@ public class BTree {
 		public boolean childrenFull(){
 			return childRear == 2*t;
 		}
-		
+
 		public void setSplitInsert(boolean splitInsert){
 			this.splitInsert = splitInsert;
 		}
@@ -294,14 +300,24 @@ public class BTree {
 		public String toString(){
 			String ss = "[";
 			for(int i = 0; i < rear-1; i++){
-				ss += keys[i] + ", ";
+				ss += keys[i].key + ", ";
 			}
-			ss += keys[rear-1];
+			ss += keys[rear-1].key;
 			ss += "]";
 			return ss;
 		}
 	}
+	public class BTreeObject{
+		private int frequency;
+		private long key;
 
-
-
+		public BTreeObject(long key){
+			this.key = key;
+			frequency = 0;
+		}
+		
+		public void incrementFreq(){
+			frequency++;
+		}
+	}
 }	

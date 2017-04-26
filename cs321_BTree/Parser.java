@@ -1,4 +1,5 @@
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,20 +26,20 @@ public class Parser {
 			skipHeader();
 			firstTime = false;
 		}
-		
+
 		char g;
 		String ss;
-		
+
 
 		if (data.available() == 0){
 			hasMore = false;
 		}
-
-		while(data.available() > 0){
-			g = (char)data.readByte();
+		try{
+		while((g = (char)data.readByte()) != -1){
+			//g = (char)data.readByte();
 			characterList.add(g);
 			ss = characterList.getSubsequence();
-			
+
 			//TODO: fix this
 			if(contains(ss, '/')) {
 				characterList.poll();
@@ -47,9 +48,9 @@ public class Parser {
 				}
 			}
 
-			//if(contains(ss,'N') || contains(ss, ' ') || contains(ss, '/') || contains(ss, '\n')){
-			if(contains(ss,'N') || contains(ss, ' ') || contains(ss, '\n') ){
-				//TODO: skip for numbers
+			if(contains(ss,'N') || contains(ss, ' ') || contains(ss, '\n') || 
+					containsDigit(ss) || contains(ss, '\t') || contains(ss, '\r')){
+
 				for (int i = 0; i < ss.length(); i++){
 					characterList.poll();
 				}
@@ -58,6 +59,10 @@ public class Parser {
 				characterList.poll();
 				return ss;
 			}
+		}
+		}
+		catch(EOFException e){
+			return "";
 		}
 
 		return "";
@@ -96,15 +101,28 @@ public class Parser {
 		}
 		return false;
 	}
-	
-	
+
+	public boolean containsDigit(String s){
+		for(int i = 0; i < s.length(); i++){
+			if (Character.isDigit(s.charAt(i))){
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 	/**
 	 * method to return the next sub sequence as a long
 	 */
 	public long getNextKey() throws IOException {
-		return stringToKey( nextSubSequence(), sequenceLength );
+		String ss = nextSubSequence();
+		if(ss.length() < sequenceLength){
+			return -1;
+		}
+		return stringToKey(ss, sequenceLength );
 	}
-	
+
 	/**
 	 * converts a string of letter DNA bases to a number
 	 * @param subsequence
@@ -113,16 +131,16 @@ public class Parser {
 	 */
 	public long stringToKey(String subsequence, int sequenceLength) {
 		long theKey = 0;
-		subsequence.toLowerCase();
+		subsequence = subsequence.toLowerCase();
 		int k = sequenceLength;
-		for (int i = 0; i < k; i += 1) {
+		for (int i = 1; i < k; i += 1) {
 			//System.out.println(subsequence.substring(i, i+1));
-			long base = mapBase(subsequence.substring(i, i+1));
-			theKey = theKey | (base<<2*i);	//setbit
+			long base = mapBase(subsequence.substring(i-1, i));
+			theKey = theKey | (base<<2*(i-1));	//setbit
 		}
 		return theKey;
 	}
-	
+
 	/**
 	 * helper method that converts a letter DNA base to a two digit binary number
 	 * @param theBase
@@ -142,7 +160,7 @@ public class Parser {
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Converts a binary number of DNA bases to a sting of letters 
 	 * @param theKey
@@ -162,8 +180,8 @@ public class Parser {
 		}
 		return theSequence;
 	}
-	
-	
+
+
 	/**
 	 * private helper method to convert a two binary digit number to the appropriate 
 	 * DNA base 
@@ -184,7 +202,7 @@ public class Parser {
 			return "error";
 		}
 	}
-	
-	
-	
+
+
+
 }

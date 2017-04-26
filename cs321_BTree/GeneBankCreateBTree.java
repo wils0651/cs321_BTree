@@ -209,8 +209,10 @@ public class GeneBankCreateBTree {
 			//long testBases = gbkParser.stringToKey(testString, sequenceLength); 	//TODO: remove
 			//System.out.println(" in binary: "+Long.toBinaryString(testBases));
 			nextKey = gbkParser.getNextKey();
+			if (nextKey != -1){
 			System.out.println(gbkParser.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
 			theBTree.insert(gbkParser.getNextKey());
+			}
 		}
 		
 		

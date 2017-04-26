@@ -22,3 +22,6 @@
 - [ ] Parser: check for another ORIGIN after //
 - [ ] Parser: stop parsing at end of listing of bases 
 - [ ] BTree node: write to disk - design file format
+- [ ] Create: metadata file
+- [ ] Search: search algorithm
+- [ ] Cache

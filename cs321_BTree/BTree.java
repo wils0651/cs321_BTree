@@ -337,9 +337,10 @@ public class BTree {
 			String mode = "rw";			//rw is read write
 			try{ 
 				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
-				fileWriter.seek(fileOffset);
+				fileWriter.seek(0);
 				System.out.println("rear: "+rear);
-				fileWriter.writeInt(31);	// the number of keys in the long
+				fileWriter.writeInt(127);	// the number of keys in the long
+				fileWriter.seek(fileOffset);
 				
 				for(int i = 0; i < (2*t-1); i += 1) {
 					if (i < rear) {

@@ -83,11 +83,11 @@ public class GeneBankCreateBTree {
 		
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
 
-		gbcbt.sendToParser();
+		//gbcbt.sendToParser();
 
 		//TODO: Put stuff into a Btree
 
-		//gbcbt.testWrite();
+		gbcbt.testWrite();
 		
 		
 
@@ -271,16 +271,29 @@ public class GeneBankCreateBTree {
 		fileWriter.close();
 
 		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
+		System.out.println("Seek to 8");
 		fileReader.seek(8);
 
-		for(int i = 0; i < maxCount/2; i++) {
+		for(int i = 0; i < (maxCount-1); i++) {
 			long elLong = fileReader.readLong();
-			//TODO: use readbyte with offset
 			System.out.print("elLong: "+elLong);
 			//long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
 			//					System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
 			System.out.println(", testing bases: " + gbkParser.keyToString(elLong, sequenceLength));
 		}
 		fileReader.close();		//close the fileReader
+		
+		RandomAccessFile fileReader2 = new RandomAccessFile(outputFile, "r");
+		System.out.println("Seek again");
+		fileReader2.seek(0);
+
+		for(int i = 0; i < (maxCount-2); i++) {
+			long elLong = fileReader2.readLong();
+			System.out.print("elLong: "+elLong);
+			//long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
+			//					System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
+			System.out.println(", testing bases: " + gbkParser.keyToString(elLong, sequenceLength));
+		}
+		fileReader2.close();		//close the fileReader
 	}
 }

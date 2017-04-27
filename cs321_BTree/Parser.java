@@ -29,7 +29,8 @@ public class Parser {
 
 		char g;
 		String ss;
-
+		
+		//System.out.println("data.available: " + data.available());
 
 		if (data.available() == 0){
 			hasMore = false;

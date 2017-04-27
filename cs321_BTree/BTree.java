@@ -10,22 +10,29 @@ public class BTree {
 	BTreeNode myRoot;
 	long fileOffset;
 	File btreeFile;
-	private int t;
+	private int t;	//degree
 
-	public BTree(int t){
+	public BTree(int t, String filename){
 		this.t = t;
+		btreeFile = new File(filename);
 	}
 
 	public void insert(long sskey){			//doesn't need to return anything but we can if we want!
 		if(myRoot == null){
 			myRoot = new BTreeNode();
-			//fileOffset = btreeFile.length();	//maybe replace this code with createNode()
-			//myRoot.setFileOffset(fileOffset);
-			//myRoot.writeNode();
 		}
 
 		myRoot.insert(new BTreeObject(sskey));
-
+		
+		//fileOffset = btreeFile.length();	//maybe replace this code with createNode()
+		fileOffset = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
+		myRoot.setFileOffset(fileOffset);
+//		try {
+//			yRoot.writeNode();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	public BTreeNode getRoot(){
@@ -64,8 +71,14 @@ public class BTree {
 		BTreeNode aNode = new BTreeNode();
 		aNode.insert(sskey);
 		//	fileOffset = btreeFile.length();
-		//	aNode.setFileOffset(fileOffset);
-		//	aNode.writeNode();
+		fileOffset = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
+		aNode.setFileOffset(fileOffset);
+		try {
+			aNode.writeNode();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return aNode;
 	}
 
@@ -291,16 +304,23 @@ public class BTree {
 			// TODO design file format
 			//String theFilename = "theTestFile.txt";
 			//File outputFile = new File(theFilename);
-			String mode = "w";			//rw is read write
-			RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
-			fileWriter.seek(fileOffset);
-			for(int i = 0; i < 2*t-1; i += 1) {
-				fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
+			String mode = "rw";			//rw is read write
+			try{ 
+				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
+				fileWriter.seek(fileOffset);
+				for(int i = 0; i < 2*t-1; i += 1) {
+					fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
+					fileWriter.writeInt(keys[i].frequency);
+				}
+				for(int i = 0; i < 2*t; i += 1) {
+					fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
+				}
+				fileWriter.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				
 			}
-			for(int i = 0; i < 2*t; i += 1) {
-				fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
-			}
-			fileWriter.close();
 
 		}
 		public boolean isFull(){

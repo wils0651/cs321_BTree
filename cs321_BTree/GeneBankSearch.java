@@ -48,9 +48,10 @@ public class GeneBankSearch {
 		
 
 
-		int thisDebugMode = -1;
+		int thisDebugMode = 0;
 		if (args.length > 2) {
-			thisDebugMode = Integer.parseInt(args[2]);
+			//TODO: change if another Debug level is added
+			//thisDebugMode = Integer.parseInt(args[2]);
 			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {
 				throw new IllegalArgumentException("Improper Debug Mode Selection");
 			}

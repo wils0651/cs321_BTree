@@ -33,13 +33,14 @@ public class GeneBankCreateBTree {
 		this.filename = filename;
 		this.sequenceLength = sequenceLength;
 		
-		theBTree = new BTree(degree);
-
+		int k = sequenceLength;
+		int t = degree;
+		String theFilename = filename+".btree.data." + k +"." +t;	//output filename?
+		
+		theBTree = new BTree(degree, theFilename);
 	}
 
-
-
-
+	
 	public static void main(String args[]) throws IOException {
 		if (args.length < 3) {
 			printUsage();
@@ -78,7 +79,8 @@ public class GeneBankCreateBTree {
 		}
 
 
-		//Create an oblect
+		//Create an object, pass int the degree, output filename,and sequence length
+		
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
 
 		gbcbt.sendToParser();
@@ -238,10 +240,10 @@ public class GeneBankCreateBTree {
 		}
 		
 		//TODO: write to disk.
-		//int k = sequenceLength;
-		//int t = degree;
-		//String theFilename = filename+".btree.data." + k +"." +t;	//TODO: uncomment this
-		String theFilename = "theTestFile.txt";
+		int k = sequenceLength;
+		int t = degree;
+		String theFilename = filename+".btree.data." + k +"." +t;	//TODO: uncomment this
+		//String theFilename = "theTestFile.txt";
 		File outputFile = new File(theFilename);
 		String mode = "rw";			//read write
 		RandomAccessFile fileWriter;

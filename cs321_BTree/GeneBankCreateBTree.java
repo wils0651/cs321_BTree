@@ -89,6 +89,12 @@ public class GeneBankCreateBTree {
 
 //		gbcbt.testWrite();
 		
+
+		//TODO: Put stuff into a Btree
+
+		//gbcbt.testWrite();
+		gbcbt.writeMetadata();
+		
 		
 
 	}

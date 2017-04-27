@@ -135,11 +135,10 @@ public class BTree {
 
 				BTreeObject removeObject = remove(middleIndex);
 				BTreeNode rightNode = createNode(removeObject);   //moves half the elements to a new node
-				//				for(int i = middleIndex; i < rear; i++){
-				//					rightNode.insert(remove(i));
-				//				}
+				
 				while(keys[middleIndex] != null){
-					rightNode.insert(remove(middleIndex));
+					removeObject = remove(middleIndex);
+					rightNode.insert(removeObject);
 				}
 
 				rightNode.setParent(myparent);
@@ -219,7 +218,7 @@ public class BTree {
 
 			for (int i = index; i < rear-1; i++){
 				retval = keys[index];
-				keys[index] = keys[index+1];
+				keys[i] = keys[i+1];
 			}
 			rear--;
 			keys[rear] = null;

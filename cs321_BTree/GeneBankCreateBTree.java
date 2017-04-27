@@ -33,7 +33,8 @@ public class GeneBankCreateBTree {
 		this.filename = filename;
 		this.sequenceLength = sequenceLength;
 		
-		theBTree = new BTree(degree);
+		
+		theBTree = new BTree(degree, filename);
 
 	}
 

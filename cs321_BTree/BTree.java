@@ -199,7 +199,7 @@ public class BTree {
 			} else {
 				BTreeObject duplicate = contains(sskey.key);
 
-				if(duplicate != null){
+				if(duplicate != null){ 
 					duplicate.incrementFreq();
 				}
 				else{

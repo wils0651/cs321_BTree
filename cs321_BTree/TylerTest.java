@@ -54,7 +54,7 @@ public class TylerTest {
 				int x = ran.nextInt(100);
 				System.out.println("adding "+x);
 				tylerTree.insert(x);
-				tylerTree.traverseTree(tylerTree.getRoot());
+				tylerTree.traverseTree();
 			}
 
 //			while(true) {
@@ -67,7 +67,7 @@ public class TylerTest {
 //			}
 //			
 			System.out.println(tylerTree.search(tylerTree.getRoot(), 20));
-			tylerTree.traverseTree(tylerTree.getRoot());
+			tylerTree.traverseTree();
 		}
 		else if (Integer.parseInt(args[0]) == 2){
 			RandomAccessFile file = new RandomAccessFile("TyTest.txt", "rw");

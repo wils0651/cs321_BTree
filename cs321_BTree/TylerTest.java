@@ -41,14 +41,19 @@ public class TylerTest {
 		else if (Integer.parseInt(args[0]) == 2){
 			RandomAccessFile file = new RandomAccessFile("TyTest.txt", "rw");
 
+			int rear = file.readInt();
+			System.out.println("rear: "+rear);
+			int count = 0;
 			while(true){
-				long key = file.readLong();
-				int frequency = file.readInt();
+				if(count < rear) {
+					long key = file.readLong();
+					int frequency = file.readInt();
 
-				System.out.println(key);
-				System.out.println(frequency);
-				for(int i = 0; i < frequency; i++){
-					tylerTree.insert(key);
+					System.out.println(key);
+					System.out.println(frequency);
+					for(int i = 0; i < frequency; i++){
+						tylerTree.insert(key);
+					}
 				}
 				tylerTree.traverseTree(tylerTree.getRoot());
 			}

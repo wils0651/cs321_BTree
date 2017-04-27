@@ -26,13 +26,13 @@ public class BTree {
 
 		//fileOffset = btreeFile.length();	//maybe replace this code with createNode()
 		fileOffset = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
-		myRoot.setFileOffset(fileOffset);
-		//		try {
-		//			yRoot.writeNode();
-		//		} catch (IOException e) {
-		//			// TODO Auto-generated catch block
-		//			e.printStackTrace();
-		//		}
+		//myRoot.setFileOffset(fileOffset);
+				try {
+					myRoot.writeNode();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	}
 
 	public BTreeNode getRoot(){
@@ -109,8 +109,7 @@ public class BTree {
 					BTreeObject removeKey = remove(middleIndex);
 					myparent.setSplitInsert(true);
 					myparent.insert(removeKey);
-				}
-				else{
+				} else {
 					BTreeObject removeKey = keys[middleIndex];	
 					remove(middleIndex);
 					BTreeNode splitNode = createNode(removeKey);
@@ -141,8 +140,7 @@ public class BTree {
 
 				if(sskey.key <= middleValue){
 					insert(sskey);
-				}
-				else{
+				} else {
 					rightNode.insert(sskey);
 				}
 				rightNode.childrenSort();
@@ -150,14 +148,12 @@ public class BTree {
 				myparent.childrenSort();
 				myRoot.childrenSort();
 
-			}
-			else if(numChildren() == 0 || splitInsert){
+			} else if (numChildren() == 0 || splitInsert){
 				BTreeObject duplicate = contains(sskey.key);
 
 				if(duplicate != null){
 					duplicate.incrementFreq();
-				}
-				else{
+				} else {
 					keys[rear] = sskey;
 					rear++;
 					//leaf
@@ -166,15 +162,12 @@ public class BTree {
 					}
 					splitInsert = false;
 				}
-			}
-			else{
+			} else {
 				if(keys[0].key > sskey.key){
 					children[0].insert(sskey);
-				}
-				else if(keys[rear-1].key < sskey.key){
+				} else if(keys[rear-1].key < sskey.key){
 					children[childRear-1].insert(sskey);
-				}
-				else{
+				} else{
 					for(int i = 0; i < rear-1; i++){
 						if(keys[i].key <= sskey.key && keys[i+1].key > sskey.key){
 							children[i+1].insert(sskey);
@@ -183,7 +176,11 @@ public class BTree {
 					}
 				}
 			}
+
 		}
+		
+		
+		
 
 		public void insertAtIndex(BTreeNode node, int index){
 			BTreeNode next = children[index+1];
@@ -326,7 +323,8 @@ public class BTree {
 			try{ 
 				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
 				fileWriter.seek(fileOffset);
-				fileWriter.writeInt(rear);	// the number of keys in the long
+				System.out.println("rear: "+rear);
+				fileWriter.writeInt(31);	// the number of keys in the long
 				
 				for(int i = 0; i < (2*t-1); i += 1) {
 					if (i < rear) {

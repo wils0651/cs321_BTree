@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class TylerTest {
 
 	public static void main(String[] args) throws InterruptedException, IOException {
-		BTree tylerTree = new BTree(2, "TyTest.txt");
+		BTree tylerTree = new BTree(3, "TyTest.txt");
 
 		if(Integer.parseInt(args[0]) == 1){
 			Scanner scan = new Scanner(System.in);
@@ -36,6 +36,7 @@ public class TylerTest {
 				long treeInsert = scan.nextLong();
 				tylerTree.insert(treeInsert);
 				tylerTree.traverseTree(tylerTree.getRoot());
+				System.out.println("Number of nodes: " + tylerTree.numNodes());
 			}
 		}
 		else if (Integer.parseInt(args[0]) == 2){

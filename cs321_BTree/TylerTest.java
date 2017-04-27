@@ -61,7 +61,7 @@ public class TylerTest {
 						tylerTree.insert(key);
 					}
 				}
-				tylerTree.traverseTree(tylerTree.getRoot());
+				tylerTree.traverseTree();
 			}
 		}
 	}

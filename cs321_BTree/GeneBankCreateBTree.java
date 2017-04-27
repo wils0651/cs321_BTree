@@ -84,6 +84,8 @@ public class GeneBankCreateBTree {
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
 
 		gbcbt.sendToParser();
+		gbcbt.stupidMethod();
+		
 
 		//TODO: Put stuff into a Btree
 
@@ -92,6 +94,15 @@ public class GeneBankCreateBTree {
 		
 		
 
+	}
+	
+	void stupidMethod() {
+		try {
+			theBTree.traverseTree(theBTree.getRoot());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 

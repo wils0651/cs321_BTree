@@ -308,11 +308,11 @@ public class BTree {
 			try{ 
 				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
 				fileWriter.seek(fileOffset);
-				for(int i = 0; i < 2*t-1; i += 1) {
+				for(int i = 0; i < rear; i += 1) {
 					fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
 					fileWriter.writeInt(keys[i].frequency);
 				}
-				for(int i = 0; i < 2*t; i += 1) {
+				for(int i = 0; i < childRear; i += 1) {
 					fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
 				}
 				fileWriter.close();

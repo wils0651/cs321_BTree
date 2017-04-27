@@ -52,6 +52,27 @@ public class BTree {
 		return false;
 	}
 	
+	public int search(BTreeNode root, long key){
+		BTreeObject found = root.contains(key);
+		if (found != null){
+			return found.frequency;
+		}
+		else if(root.numChildren() == 0){
+			return 0;				
+		}
+		else {
+			for (int i = 0; i < root.getRear(); i++){
+				if(key < root.getKeys()[i].key){
+					return search(root.getChildren()[i], key);
+				}
+				else{
+					return search(root.getChildren()[root.childRear-1], key);
+				}
+			}
+		}
+		return 0;
+	}
+	
 	public int numNodes(){
 		return numNodes;
 	}
@@ -110,7 +131,7 @@ public class BTree {
 			myparent = null;
 			splitInsert = false;
 		}
-
+			
 
 		public void insert(BTreeObject sskey){
 			if(rear == 2*t-1){					//logic for this taken from:    https://webdocs.cs.ualberta.ca/~holte/T26/ins-b-tree.html

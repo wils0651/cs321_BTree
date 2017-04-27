@@ -197,6 +197,7 @@ public class BTree {
 				if (rear > 1){
 					insertionSort(keys, rear);
 				}
+
 				splitInsert = false;
 				writeNode();
 			}

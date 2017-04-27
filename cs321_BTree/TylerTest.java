@@ -47,8 +47,28 @@ public class TylerTest {
 						tylerTree.traverseTree();
 					}
 		//			
-	}
+	
 
+//			 Random ran = new Random(); 
+//			for (int i = 10000; i >= 0; i--){
+//				int x = ran.nextInt(100);
+//				System.out.println("adding "+x);
+//				tylerTree.insert(x);
+//				tylerTree.traverseTree();
+//			}
+
+//			while(true) {
+//
+//				System.out.println("Enter a number to add to your tree, Tyler");
+//
+//				long treeInsert = scan.nextLong();
+//				tylerTree.insert(treeInsert);
+//				tylerTree.traverseTree(tylerTree.getRoot());
+//			}
+//			
+//			System.out.println(tylerTree.search(tylerTree.getRoot(), 20));
+//			tylerTree.traverseTree();
+		}
 		else if (Integer.parseInt(args[0]) == 2){
 			RandomAccessFile file = new RandomAccessFile("TyTest.txt", "rw");
 

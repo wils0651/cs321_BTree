@@ -134,6 +134,13 @@ public class BTree {
 
 
 		public void insert(BTreeObject sskey){
+			BTreeObject duplicate = contains(sskey.key);
+
+			if(duplicate != null){
+				duplicate.incrementFreq();
+				return;
+			}
+
 			if(rear == 2*t-1){					//logic for this taken from:    https://webdocs.cs.ualberta.ca/~holte/T26/ins-b-tree.html
 				int middleIndex = 1+(t-1)/2;			//middle index to be moved up
 				long middleValue = keys[middleIndex].key;
@@ -183,41 +190,31 @@ public class BTree {
 				myRoot.childrenSort();
 
 			} else if (numChildren() == 0 || splitInsert){
-				BTreeObject duplicate = contains(sskey.key);
-
-				if(duplicate != null){
-					duplicate.incrementFreq();
-				} else {
-					keys[rear] = sskey;
-					rear++;
-					//leaf
-					if (rear > 1){
-						insertionSort(keys, rear);
-					}
-					splitInsert = false;
+				keys[rear] = sskey;
+				rear++;
+				//leaf
+				if (rear > 1){
+					insertionSort(keys, rear);
 				}
-			} else {
-				BTreeObject duplicate = contains(sskey.key);
+				splitInsert = false;
+			}
 
-				if(duplicate != null){
-					duplicate.incrementFreq();
-				}
-				else{
+			else{
 
-					if(keys[0].key > sskey.key){
-						children[0].insert(sskey);
-					} else if(keys[rear-1].key < sskey.key){
-						children[childRear-1].insert(sskey);
-					} else{
-						for(int i = 0; i < rear-1; i++){
-							if(keys[i].key < sskey.key && keys[i+1].key > sskey.key){
-								children[i+1].insert(sskey);
-								return;
-							}
+				if(keys[0].key > sskey.key){
+					children[0].insert(sskey);
+				} else if(keys[rear-1].key < sskey.key){
+					children[childRear-1].insert(sskey);
+				} else{
+					for(int i = 0; i < rear-1; i++){
+						if(keys[i].key < sskey.key && keys[i+1].key > sskey.key){
+							children[i+1].insert(sskey);
+							return;
 						}
 					}
 				}
 			}
+
 		}
 
 
@@ -356,7 +353,7 @@ public class BTree {
 				fileWriter.seek(0);
 				System.out.println("rear: "+rear);
 				fileWriter.writeInt(127);	// the number of keys in the long
-				
+
 				fileWriter.seek(fileOffset);
 
 				for(int i = 0; i < (2*t-1); i += 1) {

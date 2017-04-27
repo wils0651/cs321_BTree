@@ -164,9 +164,14 @@ public class GeneBankCreateBTree {
 			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
 			//writer1.println(gbkFileName);	//name of the BTree file
 			writer1.println(degree);	//degree of tree;
+			
 			writer1.println(sequenceLength);	//
-			//writer1.println(offsetRoot);	//offset of the rootnode
-			//writer1.println(numNodes);	//
+			
+			writer1.println(theBTree.getRoot().getFileOffset());	//offset of the rootnode
+			
+			writer1.println(theBTree.numNodes());	//numberOfNodes
+			
+			
 			writer1.close();
 		} catch (IOException e) {
 			System.err.println("Error creating file: " + fileName);

@@ -9,12 +9,14 @@ import java.io.RandomAccessFile;
 public class BTree {
 	BTreeNode myRoot;
 	long fileOffset;
-	File btreeFile;
+	private File btreeFile;
 	private int t;	//degree
+	private int numNodes;
 
 	public BTree(int t, String filename){
 		this.t = t;
 		btreeFile = new File(filename);
+		numNodes = 1;
 	}
 
 	public void insert(long sskey){			//doesn't need to return anything but we can if we want!
@@ -34,6 +36,10 @@ public class BTree {
 					e.printStackTrace();
 				}
 	}
+	
+	public int getDegree(){
+		return t;
+	}
 
 	public BTreeNode getRoot(){
 		return myRoot;
@@ -44,6 +50,10 @@ public class BTree {
 			return true;
 		}
 		return false;
+	}
+	
+	public int numNodes(){
+		return numNodes;
 	}
 
 	public void traverseTree(BTreeNode root) throws InterruptedException {
@@ -90,6 +100,7 @@ public class BTree {
 		private int childRear;
 		private long fileOffset;
 		private boolean splitInsert;
+		
 
 		public BTreeNode(){				//constructor
 			keys = new BTreeObject[2*t-1];
@@ -109,13 +120,17 @@ public class BTree {
 					BTreeObject removeKey = remove(middleIndex);
 					myparent.setSplitInsert(true);
 					myparent.insert(removeKey);
-				} else {
+
+					numNodes++;
+				}
+				else{
 					BTreeObject removeKey = keys[middleIndex];	
 					remove(middleIndex);
 					BTreeNode splitNode = createNode(removeKey);
 					myRoot = splitNode;
 					this.setParent(splitNode);
 					myparent.addChild(this);
+					numNodes += 2;
 				}
 
 

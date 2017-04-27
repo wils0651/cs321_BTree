@@ -332,7 +332,7 @@ public class BTree {
 
 		public BTreeObject(long key){
 			this.key = key;
-			frequency = 0;
+			frequency = 1;
 		}
 		
 		public void incrementFreq(){

@@ -27,17 +27,22 @@ public class TylerTest {
 			tylerTree.insert(30);
 			System.out.println("adding 7");
 			tylerTree.insert(7);
+			System.out.println("adding 30");
+			tylerTree.insert(30);
+			System.out.println("adding 7");
+			tylerTree.insert(7);
 
 
-			while(true) {
-
-				System.out.println("Enter a number to add to your tree, Tyler");
-
-				long treeInsert = scan.nextLong();
-				tylerTree.insert(treeInsert);
-				tylerTree.traverseTree(tylerTree.getRoot());
-				System.out.println("Number of nodes: " + tylerTree.numNodes());
-			}
+//			while(true) {
+//
+//				System.out.println("Enter a number to add to your tree, Tyler");
+//
+//				long treeInsert = scan.nextLong();
+//				tylerTree.insert(treeInsert);
+//				tylerTree.traverseTree(tylerTree.getRoot());
+//			}
+//			
+			System.out.println(tylerTree.search(tylerTree.getRoot(), 20));
 		}
 		else if (Integer.parseInt(args[0]) == 2){
 			RandomAccessFile file = new RandomAccessFile("TyTest.txt", "rw");

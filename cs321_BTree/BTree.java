@@ -29,14 +29,14 @@ public class BTree {
 		//fileOffset = btreeFile.length();	//maybe replace this code with createNode()
 		fileOffset = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
 		//myRoot.setFileOffset(fileOffset);
-				try {
-					myRoot.writeNode();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		try {
+			myRoot.writeNode();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	
+
 	public int getDegree(){
 		return t;
 	}
@@ -51,7 +51,7 @@ public class BTree {
 		}
 		return false;
 	}
-	
+
 	public int search(BTreeNode root, long key){
 		BTreeObject found = root.contains(key);
 		if (found != null){
@@ -72,14 +72,14 @@ public class BTree {
 		}
 		return 0;
 	}
-	
+
 	public int numNodes(){
 		return numNodes;
 	}
 
-	public void traverseTree(BTreeNode root) throws InterruptedException {
+	public void traverseTree() throws InterruptedException {
 		Queue q = new Queue<BTreeNode>();
-		q.enqueue(root);
+		q.enqueue(myRoot);
 		traverseTreeRecursive(q);
 	}
 
@@ -121,7 +121,7 @@ public class BTree {
 		private int childRear;
 		private long fileOffset;
 		private boolean splitInsert;
-		
+
 
 		public BTreeNode(){				//constructor
 			keys = new BTreeObject[2*t-1];
@@ -131,7 +131,7 @@ public class BTree {
 			myparent = null;
 			splitInsert = false;
 		}
-			
+
 
 		public void insert(BTreeObject sskey){
 			if(rear == 2*t-1){					//logic for this taken from:    https://webdocs.cs.ualberta.ca/~holte/T26/ins-b-tree.html
@@ -157,7 +157,8 @@ public class BTree {
 
 				BTreeObject removeObject = remove(middleIndex);
 				BTreeNode rightNode = createNode(removeObject);   //moves half the elements to a new node
-				
+
+
 				while(keys[middleIndex] != null){
 					removeObject = remove(middleIndex);
 					rightNode.insert(removeObject);
@@ -171,9 +172,7 @@ public class BTree {
 					rightNode.addChild(addNode);
 					addNode.setParent(rightNode);
 				}
-
-
-				if(sskey.key <= middleValue){
+				if(sskey.key < middleValue){
 					insert(sskey);
 				} else {
 					rightNode.insert(sskey);
@@ -198,33 +197,29 @@ public class BTree {
 					splitInsert = false;
 				}
 			} else {
-				if(keys[0].key > sskey.key){
-					children[0].insert(sskey);
-				} else if(keys[rear-1].key < sskey.key){
-					children[childRear-1].insert(sskey);
-				} else{
-					for(int i = 0; i < rear-1; i++){
-						if(keys[i].key <= sskey.key && keys[i+1].key > sskey.key){
-							children[i+1].insert(sskey);
-							return;
+				BTreeObject duplicate = contains(sskey.key);
+
+				if(duplicate != null){
+					duplicate.incrementFreq();
+				}
+				else{
+
+					if(keys[0].key > sskey.key){
+						children[0].insert(sskey);
+					} else if(keys[rear-1].key < sskey.key){
+						children[childRear-1].insert(sskey);
+					} else{
+						for(int i = 0; i < rear-1; i++){
+							if(keys[i].key < sskey.key && keys[i+1].key > sskey.key){
+								children[i+1].insert(sskey);
+								return;
+							}
 						}
 					}
 				}
 			}
-
 		}
-		
-		
-		
 
-		public void insertAtIndex(BTreeNode node, int index){
-			BTreeNode next = children[index+1];
-			for (int i = index; i < childRear; i++){
-				children[i] = next;
-				next = children[i+1];
-			}
-			children[index] = node;
-		}
 
 		public int numChildren(){
 			return childRear;
@@ -274,6 +269,7 @@ public class BTree {
 			}
 			if(retval != null){
 				childRear--;
+				children[childRear] = null;
 			}
 			return retval;
 		}
@@ -332,20 +328,20 @@ public class BTree {
 		public BTreeNode[] getChildren(){
 			return children;
 		}
-		
-//		public BTreeNode readFile() {
-//			String mode = "rw";			//rw is read write
-//			try{ 
-//				RandomAccessFile fileReader = new RandomAccessFile(btreeFile, mode);
-//				fileReader.seek(fileOffset);
-//				fileReader.writeInt(rear);	// the number of keys in the long
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//
-//			}
-//		}
-		
+
+		//		public BTreeNode readFile() {
+		//			String mode = "rw";			//rw is read write
+		//			try{ 
+		//				RandomAccessFile fileReader = new RandomAccessFile(btreeFile, mode);
+		//				fileReader.seek(fileOffset);
+		//				fileReader.writeInt(rear);	// the number of keys in the long
+		//			} catch (IOException e) {
+		//				// TODO Auto-generated catch block
+		//				e.printStackTrace();
+		//
+		//			}
+		//		}
+
 		/**
 		 * writes to node
 		 * @throws IOException
@@ -361,7 +357,7 @@ public class BTree {
 				System.out.println("rear: "+rear);
 				fileWriter.writeInt(127);	// the number of keys in the long
 				fileWriter.seek(fileOffset);
-				
+
 				for(int i = 0; i < (2*t-1); i += 1) {
 					if (i < rear) {
 						fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
@@ -386,8 +382,8 @@ public class BTree {
 			}
 
 		}
-		
-		
+
+
 		public boolean isFull(){
 			return  rear == 2*t-1;
 		}

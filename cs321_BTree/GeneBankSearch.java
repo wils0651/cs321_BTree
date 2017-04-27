@@ -1,9 +1,17 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class GeneBankSearch {
 	private String bTreeFilename;
 	private String queryFilename;
 	private int debugMode;
+	
+	private int degree;
+	private int sequenceLength;
+	private long offsetRoot;//offset of the rootnode
+	private int numNodes;	
+	
 	
 	/*
 	 * Usage:
@@ -25,7 +33,7 @@ public class GeneBankSearch {
 		
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 		if (args.length < 2 || args.length < 4) {
 			printUsage();
 		}
@@ -58,6 +66,9 @@ public class GeneBankSearch {
 		}
 		
 		GeneBankSearch gbs = new GeneBankSearch(thisBTreeFilename, thisQueryFilename, thisDebugMode);
+		
+		gbs.readMetadata();
+		
 	}
 	
 	
@@ -83,6 +94,23 @@ public class GeneBankSearch {
 		);
 		System.exit(1);
 	}
+	
+	//TODO: move to Search?
+		/**
+		 * @throws FileNotFoundException 
+		 * 
+		 */
+		private void readMetadata() throws FileNotFoundException {
+			String fileName = "BTreeMetadata.txt";
+			File theFile = new File(fileName);
+			Scanner fileScan = new Scanner(theFile);
+			String gbkFileName = fileScan.nextLine();
+			degree = Integer.parseInt(fileScan.nextLine() );
+			sequenceLength = Integer.parseInt(fileScan.nextLine() );
+			offsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
+			numNodes= Integer.parseInt(fileScan.nextLine() );	//
+
+		}
 	
 	
 }

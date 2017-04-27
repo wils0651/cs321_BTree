@@ -8,7 +8,10 @@ import java.io.RandomAccessFile;
 
 public class BTree {
 	BTreeNode myRoot;
-	long fileOffset;
+	//long fileOffset;
+	//TODO: check this file offset stuff
+	long fileOffsetInitial = 4 + 4 + 8; //sequence length (int), number of nodes (int), root file offset (long)
+	long fileOffsetInterval;
 	private File btreeFile;
 	private int t;	//degree
 	private int numNodes;
@@ -17,6 +20,7 @@ public class BTree {
 		this.t = t;
 		btreeFile = new File(filename);
 		numNodes = 1;
+		fileOffsetInterval = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
 	}
 
 	public void insert(long sskey){			//doesn't need to return anything but we can if we want!
@@ -27,7 +31,7 @@ public class BTree {
 		myRoot.insert(new BTreeObject(sskey));
 
 		//fileOffset = btreeFile.length();	//maybe replace this code with createNode()
-		fileOffset = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
+//		fileOffsetInterval = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
 		//myRoot.setFileOffset(fileOffset);
 		try {
 			myRoot.writeNode();
@@ -102,8 +106,8 @@ public class BTree {
 		BTreeNode aNode = new BTreeNode();
 		aNode.insert(sskey);
 		//	fileOffset = btreeFile.length();
-		fileOffset = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
-		aNode.setFileOffset(fileOffset);
+		//fileOffset = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
+		//aNode.setFileOffset(fileOffsetInterval*numNodes+fileOffsetInitial);
 		try {
 			aNode.writeNode();
 		} catch (IOException e) {
@@ -130,6 +134,7 @@ public class BTree {
 			childRear = 0;
 			myparent = null;
 			splitInsert = false;
+			fileOffset = fileOffsetInterval*numNodes+fileOffsetInitial;
 		}
 
 
@@ -314,10 +319,10 @@ public class BTree {
 			return fileOffset;
 		}
 
-		public void setFileOffset(long fileOffset) {
-			this.fileOffset = fileOffset;
-
-		}
+//		public void setFileOffset(long fileOffset) {
+//			this.fileOffset = fileOffset;
+//
+//		}
 
 		public void setParent(BTreeNode parent){
 			this.myparent = parent;
@@ -352,10 +357,12 @@ public class BTree {
 			try{ 
 				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
 				fileWriter.seek(0);
-				System.out.println("rear: "+rear);
-				fileWriter.writeInt(127);	// the number of keys in the long
+				//System.out.println("rear: "+rear);
+				fileWriter.writeInt(numNodes);	// the number of keys in the long
+				fileWriter.writeLong(getRoot().getFileOffset());
 
 				fileWriter.seek(fileOffset);
+				//fileWriter.writeInt(255);
 
 				for(int i = 0; i < (2*t-1); i += 1) {
 					if (i < rear) {

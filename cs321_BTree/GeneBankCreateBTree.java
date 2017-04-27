@@ -83,7 +83,7 @@ public class GeneBankCreateBTree {
 		
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
 
-		gbcbt.sendToParser();
+		gbcbt.sendToParser(); 
 
 		//TODO: Put stuff into a Btree
 
@@ -172,13 +172,9 @@ public class GeneBankCreateBTree {
 			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
 			//writer1.println(gbkFileName);	//name of the BTree file
 			writer1.println(degree);	//degree of tree;
-			
 			writer1.println(sequenceLength);	//
-			
 			writer1.println(theBTree.getRoot().getFileOffset());	//offset of the rootnode
-			
 			writer1.println(theBTree.numNodes());	//numberOfNodes
-			
 			
 			writer1.close();
 		} catch (IOException e) {
@@ -199,7 +195,7 @@ public class GeneBankCreateBTree {
 		String gbkFileName = fileScan.nextLine();
 		int degree = Integer.parseInt(fileScan.nextLine() );
 		int sequenceLength = Integer.parseInt(fileScan.nextLine() );
-		long offsetRoot = Integer.parseInt(fileScan.nextLine() );//offset of the rootnode
+		long offsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
 		int numNodes= Integer.parseInt(fileScan.nextLine() );	//
 
 	}

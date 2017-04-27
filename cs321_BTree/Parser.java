@@ -134,7 +134,7 @@ public class Parser {
 		long theKey = 0;
 		subsequence = subsequence.toLowerCase();
 		int k = sequenceLength;
-		for (int i = 1; i < k; i += 1) {
+		for (int i = 1; i <= k; i += 1) {
 			//System.out.println(subsequence.substring(i, i+1));
 			long base = mapBase(subsequence.substring(i-1, i));
 			theKey = theKey | (base<<2*(i-1));	//setbit

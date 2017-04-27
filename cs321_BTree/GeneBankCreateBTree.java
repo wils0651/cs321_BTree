@@ -41,7 +41,7 @@ public class GeneBankCreateBTree {
 	}
 
 	
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) throws IOException, InterruptedException {
 		if (args.length < 3) {
 			printUsage();
 		}
@@ -83,11 +83,11 @@ public class GeneBankCreateBTree {
 		
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
 
-		//gbcbt.sendToParser();
+		gbcbt.sendToParser();
 
 		//TODO: Put stuff into a Btree
 
-		gbcbt.testWrite();
+//		gbcbt.testWrite();
 		
 		
 
@@ -198,7 +198,7 @@ public class GeneBankCreateBTree {
 
 	}
 
-	public void sendToParser() throws IOException {
+	public void sendToParser() throws IOException, InterruptedException {
 		File theFile = new File(filename);
 		//TODO: send file to parser
 		FileInputStream theFileStream;
@@ -221,6 +221,7 @@ public class GeneBankCreateBTree {
 			if (nextKey != -1){
 			System.out.println(gbkParser.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
 			theBTree.insert(gbkParser.getNextKey());
+			theBTree.traverseTree();
 			}
 		}
 		

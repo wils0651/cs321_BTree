@@ -1,3 +1,4 @@
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,53 +10,52 @@ import java.util.Scanner;
 public class TylerTest {
 
 	public static void main(String[] args) throws InterruptedException, IOException {
-		BTree tylerTree = new BTree(2, "TyTest.txt");
+		BTree tylerTree = new BTree(4, "TyTest.txt");
 
 		if(Integer.parseInt(args[0]) == 1){
 			Scanner scan = new Scanner(System.in);
 
-			System.out.println("adding 5");
-			tylerTree.insert(5);
-			System.out.println("adding 10");
-			tylerTree.insert(10);
-			System.out.println("adding 15");
-			tylerTree.insert(15);
-			System.out.println("adding 20");
-			tylerTree.insert(20);
-			System.out.println("adding 25");
-			tylerTree.insert(25);
-			System.out.println("adding 30");
-			tylerTree.insert(30);
-			System.out.println("adding 7");
-			tylerTree.insert(7);
-			System.out.println("adding 6");
-			tylerTree.insert(6);
-			System.out.println("adding 5");
-			tylerTree.insert(5);
-			System.out.println("adding 4");
-			tylerTree.insert(4);
-			System.out.println("adding 3");
-			tylerTree.insert(3);
-			System.out.println("adding 2");
-			tylerTree.insert(2);
-			System.out.println("adding 1");
-			tylerTree.insert(1);
-			System.out.println("adding 60");
-			tylerTree.insert(60);
-			System.out.println("adding 65");
-			tylerTree.insert(65);
-			System.out.println("adding 70");
-			tylerTree.insert(70);
-			System.out.println("adding 24");
-			tylerTree.insert(24);
+//			Parser parse = new Parser(new FileInputStream("test1mod.gbk"), 5);
+//			while(parse.hasMore()){
+//				long key = parse.stringToKey(parse.nextSubSequence(), 5);
+//				System.out.println(key);
+//				tylerTree.insert(key);
+//				tylerTree.traverseTree();
+//			}
+		
 
-			 Random ran = new Random(); 
-			for (int i = 10000; i >= 0; i--){
-				int x = ran.nextInt(100);
-				System.out.println("adding "+x);
-				tylerTree.insert(x);
-				tylerTree.traverseTree();
-			}
+					for (int i=0; i< 61; i++){
+						tylerTree.insert(i);
+						tylerTree.traverseTree();
+					}
+					tylerTree.insert(101);
+					tylerTree.traverseTree();
+					tylerTree.insert(100);
+					tylerTree.traverseTree();
+		
+		//			 Random ran = new Random(); 
+		//			for (int i = 10000; i >= 0; i--){
+		//				int x = ran.nextInt(100);
+		//				System.out.println("adding "+x);
+		//				tylerTree.insert(x);
+
+					while(true) {
+		
+						System.out.println("Enter a number to add to your tree, Tyler");
+						long treeInsert = scan.nextLong();
+						tylerTree.insert(treeInsert);
+						tylerTree.traverseTree();
+					}
+		//			
+	
+
+//			 Random ran = new Random(); 
+//			for (int i = 10000; i >= 0; i--){
+//				int x = ran.nextInt(100);
+//				System.out.println("adding "+x);
+//				tylerTree.insert(x);
+//				tylerTree.traverseTree();
+//			}
 
 //			while(true) {
 //
@@ -66,8 +66,8 @@ public class TylerTest {
 //				tylerTree.traverseTree(tylerTree.getRoot());
 //			}
 //			
-			System.out.println(tylerTree.search(tylerTree.getRoot(), 20));
-			tylerTree.traverseTree();
+//			System.out.println(tylerTree.search(tylerTree.getRoot(), 20));
+//			tylerTree.traverseTree();
 		}
 		else if (Integer.parseInt(args[0]) == 2){
 			RandomAccessFile file = new RandomAccessFile("TyTest.txt", "rw");

@@ -23,16 +23,16 @@ public class BTree {
 		}
 
 		myRoot.insert(new BTreeObject(sskey));
-		
+
 		//fileOffset = btreeFile.length();	//maybe replace this code with createNode()
 		fileOffset = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
 		myRoot.setFileOffset(fileOffset);
-//		try {
-//			yRoot.writeNode();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		//		try {
+		//			yRoot.writeNode();
+		//		} catch (IOException e) {
+		//			// TODO Auto-generated catch block
+		//			e.printStackTrace();
+		//		}
 	}
 
 	public BTreeNode getRoot(){
@@ -99,7 +99,7 @@ public class BTree {
 			myparent = null;
 			splitInsert = false;
 		}
-		
+
 
 		public void insert(BTreeObject sskey){
 			if(rear == 2*t-1){					//logic for this taken from:    https://webdocs.cs.ualberta.ca/~holte/T26/ins-b-tree.html
@@ -283,7 +283,7 @@ public class BTree {
 		public void setRear(int rear){
 			this.rear = rear;
 		}
-		
+
 		public long getFileOffset() {
 			return fileOffset;
 		}
@@ -300,6 +300,24 @@ public class BTree {
 		public BTreeNode[] getChildren(){
 			return children;
 		}
+		
+//		public BTreeNode readFile() {
+//			String mode = "rw";			//rw is read write
+//			try{ 
+//				RandomAccessFile fileReader = new RandomAccessFile(btreeFile, mode);
+//				fileReader.seek(fileOffset);
+//				fileReader.writeInt(rear);	// the number of keys in the long
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//
+//			}
+//		}
+		
+		/**
+		 * writes to node
+		 * @throws IOException
+		 */
 		public void writeNode() throws IOException {
 			// TODO design file format
 			//String theFilename = "theTestFile.txt";
@@ -308,21 +326,34 @@ public class BTree {
 			try{ 
 				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
 				fileWriter.seek(fileOffset);
-				for(int i = 0; i < rear; i += 1) {
-					fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
-					fileWriter.writeInt(keys[i].frequency);
+				fileWriter.writeInt(rear);	// the number of keys in the long
+				
+				for(int i = 0; i < (2*t-1); i += 1) {
+					if (i < rear) {
+						fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
+						fileWriter.writeInt(keys[i].frequency);
+					} else {
+						fileWriter.writeLong(0);
+						fileWriter.writeInt(0);
+					}
 				}
 				for(int i = 0; i < childRear; i += 1) {
-					fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
+					if(i<rear) {
+						fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
+					} else {
+						fileWriter.writeLong(0);
+					}
 				}
 				fileWriter.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				
+
 			}
 
 		}
+		
+		
 		public boolean isFull(){
 			return  rear == 2*t-1;
 		}
@@ -354,7 +385,7 @@ public class BTree {
 			this.key = key;
 			frequency = 1;
 		}
-		
+
 		public void incrementFreq(){
 			frequency++;
 		}

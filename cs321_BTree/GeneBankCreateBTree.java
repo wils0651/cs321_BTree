@@ -83,11 +83,12 @@ public class GeneBankCreateBTree {
 		
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
 
-		//gbcbt.sendToParser();
+		gbcbt.sendToParser();
 
 		//TODO: Put stuff into a Btree
 
-		gbcbt.testWrite();
+		//gbcbt.testWrite();
+		gbcbt.writeMetadata();
 		
 		
 

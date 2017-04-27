@@ -339,6 +339,7 @@ public class BTree {
 				fileWriter.seek(0);
 				System.out.println("rear: "+rear);
 				fileWriter.writeInt(127);	// the number of keys in the long
+				
 				fileWriter.seek(fileOffset);
 				
 				for(int i = 0; i < (2*t-1); i += 1) {

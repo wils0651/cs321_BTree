@@ -1,6 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Scanner;
+
+import javax.sound.midi.Sequence;
 
 public class GeneBankSearch {
 	private String bTreeFilename;
@@ -9,7 +13,7 @@ public class GeneBankSearch {
 	
 	private int degree;
 	private int sequenceLength;
-	private long offsetRoot;//offset of the rootnode
+	private long fileOffsetRoot;//offset of the rootnode
 	private int numNodes;	
 	
 	
@@ -34,7 +38,7 @@ public class GeneBankSearch {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
-		if (args.length < 2 || args.length < 4) {
+		if (args.length < 2 || args.length > 3) {
 			printUsage();
 		}
 
@@ -47,19 +51,20 @@ public class GeneBankSearch {
 		}
 
 		//check <query file>
-		String thisQueryFilename = args[0];
+		String thisQueryFilename = args[1];
 		File theQueryFile = new File(thisQueryFilename);
 		if(!theQueryFile.exists()) {
 			System.err.println("Query file not found.");
 			System.exit(1);
 		}
 		
+		
 
 
 		int thisDebugMode = 0;
 		if (args.length > 2) {
 			//TODO: change if another Debug level is added
-			//thisDebugMode = Integer.parseInt(args[2]);
+			thisDebugMode = Integer.parseInt(args[2]);
 			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {
 				throw new IllegalArgumentException("Improper Debug Mode Selection");
 			}
@@ -67,7 +72,14 @@ public class GeneBankSearch {
 		
 		GeneBankSearch gbs = new GeneBankSearch(thisBTreeFilename, thisQueryFilename, thisDebugMode);
 		
+		int fileNameLength = thisQueryFilename.length();
+		gbs.sequenceLength = Integer.parseInt(thisQueryFilename.substring(fileNameLength-1, fileNameLength) );
+		
 		gbs.readMetadata();
+		
+		gbs.readFile();
+		
+		
 		
 	}
 	
@@ -104,13 +116,87 @@ public class GeneBankSearch {
 			String fileName = "BTreeMetadata.txt";
 			File theFile = new File(fileName);
 			Scanner fileScan = new Scanner(theFile);
-			String gbkFileName = fileScan.nextLine();
+			
+			//String gbkFileName = fileScan.nextLine();
 			degree = Integer.parseInt(fileScan.nextLine() );
 			sequenceLength = Integer.parseInt(fileScan.nextLine() );
-			offsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
+			fileOffsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
+			System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
 			numNodes= Integer.parseInt(fileScan.nextLine() );	//
-
+			System.out.println("numNodes: " + numNodes);
 		}
+		
+//		public BTreeNode readFile() {
+		public void readFile() {
+			String mode = "r";			//rw is read write
+			//int numNodes;				//number of nodes in the full file
+			//long fileOffsetRoot;		//fileoffset of the root
+			
+			int numberOfKeys;			//number of keys in a node
+			
+			long[] keys;
+			int[] frequencies;
+			long[] childOffsets;
+			
+			try{ 
+				RandomAccessFile fileReader = new RandomAccessFile(bTreeFilename, mode);
+				fileReader.seek(0);
+				numNodes = fileReader.readInt();	// the number of keys in the long
+				fileOffsetRoot = fileReader.readLong();
+				fileReader.seek(fileOffsetRoot);
+				
+				numberOfKeys =  fileReader.readInt();
+				
+				keys = new long[numberOfKeys];
+				frequencies = new int[numberOfKeys];
+				childOffsets = new long[numberOfKeys+1];
+				
+				System.out.println("numNodes: " + numNodes);
+				System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
+				System.out.println("numberOfKeys: " + numberOfKeys);
+				
+				for(int i = 0; i < (numberOfKeys); i += 1) {
+					keys[i] = fileReader.readLong();
+					frequencies[i] = fileReader.readInt();
+					System.out.println("key: " + keys[i]);
+				}
+				for(int i = 0; i <= numberOfKeys; i += 1) {
+					childOffsets[i] = fileReader.readLong();
+				}
+				
+				fileReader.close();
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+
+//
+//				for(int i = 0; i < (2*t-1); i += 1) {
+//					if (i < rear) {
+//						fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
+//						fileWriter.writeInt(keys[i].frequency);
+//					} else {
+//						fileWriter.writeLong(0);
+//						fileWriter.writeInt(0);
+//					}
+//				}
+//				for(int i = 0; i < childRear; i += 1) {
+//					if(i<rear) {
+//						fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
+//					} else {
+//						fileWriter.writeLong(0);
+//					}
+//				}
+//				fileWriter.close();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//
+//			}
 	
 	
 }

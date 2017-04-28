@@ -20,7 +20,7 @@ public class BTree {
 		this.t = t;
 		btreeFile = new File(filename);
 		numNodes = 1;
-		fileOffsetInterval = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
+		fileOffsetInterval = 4 + 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);	//num nodes, keys, frequency, file offsets
 	}
 
 	public void insert(long sskey) throws IOException{			//doesn't need to return anything but we can if we want!
@@ -337,7 +337,7 @@ public class BTree {
 		}
 
 		//		public BTreeNode readFile() {
-		//			String mode = "rw";			//rw is read write
+		//			String mode = "r";			//rw is read write
 		//			try{ 
 		//				RandomAccessFile fileReader = new RandomAccessFile(btreeFile, mode);
 		//				fileReader.seek(fileOffset);
@@ -357,17 +357,18 @@ public class BTree {
 			// TODO design file format
 			//String theFilename = "theTestFile.txt";
 			//File outputFile = new File(theFilename);
-			String mode = "rw";			//rw is read write
+			String mode = "rwd";			//rw is read write
 			try{ 
 				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
+				// General B Tree Info
 				fileWriter.seek(0);
 				//System.out.println("rear: "+rear);
 				fileWriter.writeInt(numNodes);	// the number of keys in the long
 				fileWriter.writeLong(getRoot().getFileOffset());
 
+				// Individual Node Info:
 				fileWriter.seek(fileOffset);
-				//fileWriter.writeInt(255);
-
+				fileWriter.writeInt(rear);	//number of keys in node
 				for(int i = 0; i < (2*t-1); i += 1) {
 					if (i < rear) {
 						fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.

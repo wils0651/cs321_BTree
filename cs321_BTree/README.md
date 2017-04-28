@@ -26,5 +26,5 @@
 - [x] Create: metadata file
 - [x] Search: search algorithm
 - [ ] Search: rebuild BTree
-- [ ] 
+- [ ] BTree: file offset for root is wrong
 - [ ] Cache

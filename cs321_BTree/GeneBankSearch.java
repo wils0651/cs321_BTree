@@ -157,13 +157,24 @@ public class GeneBankSearch {
 				System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
 				System.out.println("numberOfKeys: " + numberOfKeys);
 				
-				for(int i = 0; i < (numberOfKeys); i += 1) {
-					keys[i] = fileReader.readLong();
-					frequencies[i] = fileReader.readInt();
-					System.out.println("key: " + keys[i]);
+				for(int i = 0; i < (2*degree-1); i += 1) {
+					if ( i < numberOfKeys) {
+						keys[i] = fileReader.readLong();
+						frequencies[i] = fileReader.readInt();
+						System.out.println("key: " + keys[i]);
+					} else {
+						long junk1 = fileReader.readLong();
+						int junk2 = fileReader.readInt();
+					}
+
 				}
-				for(int i = 0; i <= numberOfKeys; i += 1) {
-					childOffsets[i] = fileReader.readLong();
+				for(int i = 0; i <= (2*degree); i += 1) {
+					if(i <= numberOfKeys) {
+						childOffsets[i] = fileReader.readLong();
+						System.out.println("FileOffset: "+childOffsets[i]);
+					} else {
+						long junk = fileReader.readLong();
+					}
 				}
 				
 				fileReader.close();

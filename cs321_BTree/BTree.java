@@ -35,10 +35,6 @@ public class BTree {
 		//myRoot.setFileOffset(fileOffset);
 	}
 	
-	public void writeRoot() throws IOException{
-		myRoot.writeNode();
-	}
-	
 	public int getDegree(){
 		return t;
 	}

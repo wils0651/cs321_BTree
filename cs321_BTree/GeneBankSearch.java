@@ -134,37 +134,17 @@ public class GeneBankSearch {
 			//int numNodes;				//number of nodes in the full file
 			//long fileOffsetRoot;		//fileoffset of the root
 			
-			int numberOfKeys;			//number of keys in a node
-			
-			long[] keys;
-			int[] frequencies;
-			long[] childOffsets;
 			
 			try{ 
 				RandomAccessFile fileReader = new RandomAccessFile(bTreeFilename, mode);
 				fileReader.seek(0);
 				numNodes = fileReader.readInt();	// the number of keys in the long
 				fileOffsetRoot = fileReader.readLong();
-				fileReader.seek(fileOffsetRoot);
-				
-				numberOfKeys =  fileReader.readInt();
-				
-				keys = new long[numberOfKeys];
-				frequencies = new int[numberOfKeys];
-				childOffsets = new long[numberOfKeys+1];
-				
 				System.out.println("numNodes: " + numNodes);
 				System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
-				System.out.println("numberOfKeys: " + numberOfKeys);
 				
-				for(int i = 0; i < (numberOfKeys); i += 1) {
-					keys[i] = fileReader.readLong();
-					frequencies[i] = fileReader.readInt();
-					System.out.println("key: " + keys[i]);
-				}
-				for(int i = 0; i <= numberOfKeys; i += 1) {
-					childOffsets[i] = fileReader.readLong();
-				}
+				
+				searchNode(fileReader, fileOffsetRoot);
 				
 				fileReader.close();
 				
@@ -173,6 +153,37 @@ public class GeneBankSearch {
 				e.printStackTrace();
 			}
 			
+			
+		}
+		public void searchNode(RandomAccessFile fileReader, long fileOffset) throws IOException{
+			fileReader.seek(fileOffset);
+			
+			int numberOfKeys;			//number of keys in a node
+			
+			long[] keys;
+			int[] frequencies;
+			long[] childOffsets;
+			numberOfKeys =  fileReader.readInt();
+			
+			keys = new long[numberOfKeys];
+			frequencies = new int[numberOfKeys];
+			childOffsets = new long[numberOfKeys+1];
+			
+			System.out.println("numberOfKeys: " + numberOfKeys);
+			
+			for(int i = 0; i < (numberOfKeys); i += 1) {
+				keys[i] = fileReader.readLong();
+				frequencies[i] = fileReader.readInt();
+				System.out.println("key: " + keys[i]);
+			}
+			for(int i = 0; i <= numberOfKeys; i += 1) {
+				childOffsets[i] = fileReader.readLong();
+				System.out.println(childOffsets[i]);
+				if(childOffsets[i] != 0){
+					System.out.println("new child node being read...");
+					searchNode(fileReader, childOffsets[i]);  //searches every child!
+				}
+			}
 			
 		}
 

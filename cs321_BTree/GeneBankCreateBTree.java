@@ -226,6 +226,7 @@ public class GeneBankCreateBTree {
 			theBTree.traverseTree();
 			}
 		}
+		theBTree.writeRoot();
 		System.out.println("numberOfNodes: " + theBTree.numNodes());
 		
 		

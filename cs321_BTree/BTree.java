@@ -34,7 +34,11 @@ public class BTree {
 //		fileOffsetInterval = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
 		//myRoot.setFileOffset(fileOffset);
 	}
-
+	
+	public void writeRoot() throws IOException{
+		myRoot.writeNode();
+	}
+	
 	public int getDegree(){
 		return t;
 	}
@@ -90,6 +94,7 @@ public class BTree {
 		System.out.println(node.toString());
 
 		for (int i = 0; i < node.numChildren(); i++){
+			System.out.println(node.getChildren()[i].getFileOffset());
 			q.enqueue(node.getChildren()[i]);
 		}
 
@@ -380,6 +385,7 @@ public class BTree {
 				}
 				for(int i = 0; i < 2*t; i += 1) {
 					if(i<childRear) {
+						System.out.println(children[i].getFileOffset());
 						fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
 					} else {
 						fileWriter.writeLong(0);

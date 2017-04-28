@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 import javax.sound.midi.Sequence;
 
+import sun.misc.Queue;
+
 public class GeneBankSearch {
 	private String bTreeFilename;
 	private String queryFilename;
@@ -14,7 +16,8 @@ public class GeneBankSearch {
 	private int degree;
 	private int sequenceLength;
 	private long fileOffsetRoot;//offset of the rootnode
-	private int numNodes;	
+	private int numNodes;
+	private RandomAccessFile fileReader;
 	
 	
 	/*
@@ -37,7 +40,7 @@ public class GeneBankSearch {
 		
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 		if (args.length < 2 || args.length > 3) {
 			printUsage();
 		}
@@ -129,22 +132,21 @@ public class GeneBankSearch {
 		}
 		
 //		public BTreeNode readFile() {
-		public void readFile() {
+		public void readFile() throws InterruptedException {
 			String mode = "r";			//rw is read write
 			//int numNodes;				//number of nodes in the full file
 			//long fileOffsetRoot;		//fileoffset of the root
 			
 			
 			try{ 
-				RandomAccessFile fileReader = new RandomAccessFile(bTreeFilename, mode);
+				fileReader = new RandomAccessFile(bTreeFilename, mode);
 				fileReader.seek(0);
 				numNodes = fileReader.readInt();	// the number of keys in the long
 				fileOffsetRoot = fileReader.readLong();
 				System.out.println("numNodes: " + numNodes);
 				System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
 				
-				
-				searchNode(fileReader, fileOffsetRoot);
+				traverseTree();
 				
 				fileReader.close();
 				
@@ -155,7 +157,27 @@ public class GeneBankSearch {
 			
 			
 		}
-		public void searchNode(RandomAccessFile fileReader, long fileOffset) throws IOException{
+		
+		public void traverseTree() throws InterruptedException, IOException {
+			Queue q = new Queue<Long>();
+			q.enqueue(fileOffsetRoot);
+			int nodeCount = 0;
+			traverseTreeRecursive(q, nodeCount);
+		}
+
+		public void traverseTreeRecursive(Queue<Long> q, int nodeCount) throws InterruptedException, IOException {
+			if (q.isEmpty()){
+				return;
+			}
+			if (nodeCount ==numNodes){
+				return;
+			}
+			
+			Long fileOffset = q.dequeue();
+			nodeCount++;
+			System.out.println("This is node number: " + nodeCount);
+			System.out.println(fileOffset);
+
 			fileReader.seek(fileOffset);
 			
 			int numberOfKeys;			//number of keys in a node
@@ -163,28 +185,37 @@ public class GeneBankSearch {
 			long[] keys;
 			int[] frequencies;
 			long[] childOffsets;
-			numberOfKeys =  fileReader.readInt();
 			
+			numberOfKeys =  fileReader.readInt();
 			keys = new long[numberOfKeys];
 			frequencies = new int[numberOfKeys];
 			childOffsets = new long[numberOfKeys+1];
 			
-			System.out.println("numberOfKeys: " + numberOfKeys);
-			
-			for(int i = 0; i < (numberOfKeys); i += 1) {
-				keys[i] = fileReader.readLong();
-				frequencies[i] = fileReader.readInt();
-				System.out.println("key: " + keys[i]);
+			for(int i = 0; i < (2*degree-1); i += 1) {
+				if ( i < numberOfKeys) {
+					keys[i] = fileReader.readLong();
+					frequencies[i] = fileReader.readInt();
+					System.out.println("key: " + keys[i]);
+				} else {
+					long junk1 = fileReader.readLong();
+					int junk2 = fileReader.readInt();
+				}
+
 			}
-			for(int i = 0; i <= numberOfKeys; i += 1) {
-				childOffsets[i] = fileReader.readLong();
-				System.out.println(childOffsets[i]);
-				if(childOffsets[i] != 0){
-					System.out.println("new child node being read...");
-					searchNode(fileReader, childOffsets[i]);  //searches every child!
+			for(int i = 0; i <= (2*degree); i += 1) {
+				if(i <= numberOfKeys) {
+					childOffsets[i] = fileReader.readLong();
+					System.out.println("FileOffset: "+childOffsets[i]);
+					if(childOffsets[0] != 0){
+					q.enqueue(childOffsets[i]);
+					}
+					
+				} else {
+					long junk = fileReader.readLong();
 				}
 			}
-			
+
+			traverseTreeRecursive(q,nodeCount);
 		}
 
 //

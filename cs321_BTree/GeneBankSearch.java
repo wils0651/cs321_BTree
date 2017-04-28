@@ -73,7 +73,9 @@ public class GeneBankSearch {
 		GeneBankSearch gbs = new GeneBankSearch(thisBTreeFilename, thisQueryFilename, thisDebugMode);
 		
 		int fileNameLength = thisQueryFilename.length();
-		gbs.sequenceLength = Integer.parseInt(thisQueryFilename.substring(fileNameLength-1, fileNameLength) );
+		//gbs.sequenceLength = Integer.parseInt(thisQueryFilename.substring(fileNameLength-1, fileNameLength) );
+		gbs.sequenceLength = 6;
+		
 		
 		gbs.readMetadata();
 		

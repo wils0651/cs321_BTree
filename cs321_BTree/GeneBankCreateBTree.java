@@ -123,7 +123,7 @@ public class GeneBankCreateBTree {
 	}
 
 	/**
-	 * method to write to a textfile named dumep. Uses a hashmap to count the 
+	 * method to write to a textfile named dump. Uses a hashmap to count the 
 	 * frequency of sequences in an inorder traversal.
 	 */
 	private void debugDump() {
@@ -222,7 +222,7 @@ public class GeneBankCreateBTree {
 			nextKey = gbkParser.getNextKey();
 			if (nextKey != -1){
 			System.out.println(gbkParser.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
-			theBTree.insert(gbkParser.getNextKey());
+			theBTree.insert(nextKey);
 			theBTree.traverseTree();
 			}
 		}

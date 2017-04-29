@@ -355,7 +355,7 @@ public class BTree {
 		 */
 		public void writeNode() throws IOException {
 			// TODO design file format
-			//sequence length (int), degree (int), number of nodes (int), root file offset (long)
+			//root file offset (long), sequence length (int), degree (int), number of nodes (int)
 			//String theFilename = "theTestFile.txt";
 			//File outputFile = new File(theFilename);
 			String mode = "rwd";			//rw is read write
@@ -364,10 +364,10 @@ public class BTree {
 				// General B Tree Info
 				fileWriter.seek(0);
 				//System.out.println("rear: "+rear);
+				fileWriter.writeLong(getRoot().getFileOffset());	//root file offset
 				fileWriter.writeInt(sequenceLength);	//sequenceLength
 				fileWriter.writeInt(t);			//degree
 				fileWriter.writeInt(numNodes);	// the total number of nodes, TN: I dont think its necessary to print this
-				fileWriter.writeLong(getRoot().getFileOffset());	//root file offset
 
 				// Individual Node Info:
 				fileWriter.seek(fileOffset);

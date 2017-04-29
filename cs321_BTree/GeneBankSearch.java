@@ -141,14 +141,15 @@ public class GeneBankSearch {
 	 */
 	public void readFile() throws InterruptedException {
 		//File Header Structure:
+		//root file offset (long), sequence length (int), degree (int), number of nodes (int), 
 		//sequence length (int), degree (int), number of nodes (int), root file offset (long)
 
 		try{ 
 			fileReader.seek(0);
+			fileOffsetRoot = fileReader.readLong();
 			sequenceLength = fileReader.readInt();	//length of base sequence
 			degree = fileReader.readInt();		// the degree of the B Tree nodes
 			numNodes = fileReader.readInt();	// the number of keys in the long
-			fileOffsetRoot = fileReader.readLong();
 			
 			System.out.println("sequenceLength: " + sequenceLength);
 			System.out.println("degree: " + degree);

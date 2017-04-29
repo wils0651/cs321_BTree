@@ -22,9 +22,13 @@
 - [x] Parser: check for another ORIGIN after //
 - [x] Parser: stop parsing at end of listing of bases 
 - [x] Parser: not reading all sequences... going by twos, removing the last base
-- [ ] BTree node: write to disk - design file format
+- [x] BTree node: write to disk - design file format
 - [x] Create: metadata file
 - [x] Search: search algorithm
-- [ ] Search: rebuild BTree
-- [ ] BTree: file offset for root is wrong
-- [ ] Cache
+- [x] Search: rebuild BTree?
+- [ ] Search seems to have an error for some sequence lengths
+- [x] BTree: file offset for root is wrong
+- [ ] BTree: error with file offsets for root's children
+- [ ] Cache: need to implement
+- [ ] debugDump - need to implement
+- [ ] test4.gbk error - this test file has no DNA sequences

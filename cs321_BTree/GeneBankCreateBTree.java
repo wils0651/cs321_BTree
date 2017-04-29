@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
-import java.util.Scanner;
 
 public class GeneBankCreateBTree {
 	private int sequenceLength;	//Length of each DNA sequence stored in the BTree, k
@@ -12,6 +11,7 @@ public class GeneBankCreateBTree {
 	private Parser gbkParser; //parser
 	private String filename;
 	private BTree theBTree;
+	private KeyStringConverter ksConverter;
 
 	/*
 	 * Usage:
@@ -33,15 +33,16 @@ public class GeneBankCreateBTree {
 		this.filename = filename;
 		this.sequenceLength = sequenceLength;
 		
-		int k = sequenceLength;
-		int t = degree;
-		String theFilename = filename+".btree.data." + k +"." +t;	//output filename?
+		//int k = sequenceLength;
+		//int t = degree;
+		String theFilename = filename+".btree.data." + sequenceLength +"." +degree;	//output filename?
 		
-		theBTree = new BTree(degree, theFilename);
+		theBTree = new BTree(degree, sequenceLength, theFilename);
+		ksConverter = new KeyStringConverter();
 	}
 
 	
-	public static void main(String args[]) throws IOException, InterruptedException {
+	public static void main(String args[]) throws Exception {
 		if (args.length < 3) {
 			printUsage();
 		}
@@ -85,13 +86,6 @@ public class GeneBankCreateBTree {
 
 		gbcbt.sendToParser(); 
 
-		//TODO: Put stuff into a Btree
-
-//		gbcbt.testWrite();
-		
-
-		//TODO: Put stuff into a Btree
-
 		//gbcbt.testWrite();
 		gbcbt.writeMetadata();
 		
@@ -132,23 +126,33 @@ public class GeneBankCreateBTree {
 		 * <frequency> <DNA string>. The dump file contains frequency and DNA string
 		 * (corresponding to the key stored) in an inorder traversal.
 		 */
+		//TODO: 
+		String fileName = "dump";
 
-		//TODO: create a hashmap of sequences from and in-order traversal
-
-		//TODO: dump the hashmap to a file 
-
+		try{
+			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
+			//writer1.println(gbkFileName);	//name of the BTree file
+			writer1.println("TODO");	//degree of tree;
+			
+			writer1.close();
+		} catch (IOException e) {
+			System.err.println("Error creating file: " + fileName);
+			System.exit(1);
+		}
 	}
+	
 
 	/**
 	 * sets the default size of the B Trees
 	 */
 	private static int bTreeDefaultSize() {
-		int sizeHeader = 100;	//bytes
-		int sizeObject = 40;	//bytes, (2t-1)
-		int sizeChild  = 4;		//bytes, (2t)
+		int sizeHeader = 4 + 4 + 4 + 8;	//bytes
+		int sizeObject = 8 + 4;	//bytes, (2t-1)
+		int sizeChild  = 8;		//bytes, (2t)
 		int sizeParent = 4;		//bytes
 		int sizeBlock  = 4096;	//bytes, size of block on disk
-		int numObjects = (sizeBlock - sizeParent + sizeObject - sizeHeader)/(2*sizeChild + 2*sizeObject);
+		//int numObjects = (sizeBlock - sizeParent + sizeObject - sizeHeader)/(2*sizeChild + 2*sizeObject);
+		int numObjects = (sizeBlock + sizeObject - sizeHeader)/(2*sizeChild + 2*sizeObject);
 		return numObjects;
 	}
 
@@ -183,24 +187,28 @@ public class GeneBankCreateBTree {
 		}
 	}
 
-	//TODO: move to Search?
+//	//TODO: move to Search?
+//	/**
+//	 * @throws FileNotFoundException 
+//	 * 
+//	 */
+//	private void readMetadata() throws FileNotFoundException {
+//		String fileName = "BTreeMetadata.txt";
+//		File theFile = new File(fileName);
+//		Scanner fileScan = new Scanner(theFile);
+//		String gbkFileName = fileScan.nextLine();
+//		int degree = Integer.parseInt(fileScan.nextLine() );
+//		int sequenceLength = Integer.parseInt(fileScan.nextLine() );
+//		long offsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
+//		int numNodes= Integer.parseInt(fileScan.nextLine() );	//
+//	}
+
+	
 	/**
-	 * @throws FileNotFoundException 
-	 * 
+	 * method to send the gene base file to the parser and B Tree
+	 * @throws Exception 
 	 */
-	private void readMetadata() throws FileNotFoundException {
-		String fileName = "BTreeMetadata.txt";
-		File theFile = new File(fileName);
-		Scanner fileScan = new Scanner(theFile);
-		String gbkFileName = fileScan.nextLine();
-		int degree = Integer.parseInt(fileScan.nextLine() );
-		int sequenceLength = Integer.parseInt(fileScan.nextLine() );
-		long offsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
-		int numNodes= Integer.parseInt(fileScan.nextLine() );	//
-
-	}
-
-	public void sendToParser() throws IOException, InterruptedException {
+	public void sendToParser() throws Exception {
 		File theFile = new File(filename);
 		//TODO: send file to parser
 		FileInputStream theFileStream;
@@ -214,29 +222,22 @@ public class GeneBankCreateBTree {
 		
 		long nextKey;
 		while(gbkParser.hasMore() ) {
-			//String testString = gbkParser.nextSubSequence();	//TODO: remove
-			//System.out.print(countSeq);
-			//System.out.print(", testString: " + testString); 	//TODO: remove
-			//long testBases = gbkParser.stringToKey(testString, sequenceLength); 	//TODO: remove
-			//System.out.println(" in binary: "+Long.toBinaryString(testBases));
 			nextKey = gbkParser.getNextKey();
 			if (nextKey != -1){
-			System.out.println(gbkParser.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
+			System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
 			theBTree.insert(nextKey);
 			theBTree.traverseTree();
 			}
 		}
 		System.out.println("numberOfNodes: " + theBTree.numNodes());
-		theBTree.insert(386);
-		
 	}
 
 
 	/**
 	 * test method
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void testWrite() throws IOException {
+	public void testWrite() throws Exception {
 		//TODO: delete this method
 		
 		File theFile = new File(filename);
@@ -267,10 +268,9 @@ public class GeneBankCreateBTree {
 			String testString = gbkParser.nextSubSequence();	//TODO: remove
 			System.out.print(countSeq);
 			System.out.print(", testString: " + testString); 	//TODO: remove
-			long testBases = gbkParser.stringToKey(testString, sequenceLength); 	//TODO: remove
+			long testBases = ksConverter.stringToKey(testString, sequenceLength); 	//TODO: remove
 			System.out.println(" in binary: "+Long.toBinaryString(testBases));
 
-			//fileWriter.writeLong(elKey);		//Writes a long to the file as eight bytes, high byte first.
 			fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
 
 			countSeq++;
@@ -286,9 +286,7 @@ public class GeneBankCreateBTree {
 		for(int i = 0; i < (maxCount-1); i++) {
 			long elLong = fileReader.readLong();
 			System.out.print("elLong: "+elLong);
-			//long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
-			//					System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
-			System.out.println(", testing bases: " + gbkParser.keyToString(elLong, sequenceLength));
+			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
 		}
 		fileReader.close();		//close the fileReader
 		
@@ -299,9 +297,7 @@ public class GeneBankCreateBTree {
 		for(int i = 0; i < (maxCount-2); i++) {
 			long elLong = fileReader2.readLong();
 			System.out.print("elLong: "+elLong);
-			//long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
-			//					System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
-			System.out.println(", testing bases: " + gbkParser.keyToString(elLong, sequenceLength));
+			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
 		}
 		fileReader2.close();		//close the fileReader
 	}

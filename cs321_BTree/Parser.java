@@ -31,40 +31,41 @@ public class Parser {
 
 		char g;
 		String ss;
-		
+
 		//System.out.println("data.available: " + data.available());
 
 		if (data.available() == 0){
 			hasMore = false;
 		}
 		try{
-		while((g = (char)data.readByte()) != -1){
-			//g = (char)data.readByte();
-			
-			if(g != ' '){
-				characterList.add(g);
-			}
-			
-			ss = characterList.getSubsequence();
+			while((g = (char)data.readByte()) != -1){
+				//g = (char)data.readByte();
 
-			//TODO: fix this
-			if(contains(ss, '/')) {
-				characterList.poll();
+				if(g != ' ' && g != '\n' && g != '\r' && g != '\t'){
+					characterList.add(g);
+				}
+
+				ss = characterList.getSubsequence();
+
 				if(contains(ss, '/')) {
-					skipHeader();
-				}
-			}
-
-			if(contains(ss,'N') || contains(ss,'n') || containsDigit(ss)){
-				for (int i = 0; i < ss.length(); i++){
 					characterList.poll();
+					System.out.println("found a slash");
+					if(contains(ss, '/')) {
+						System.out.println("found a second slash and skipping header");
+						skipHeader();
+					}
+				}
+
+				else if(contains(ss,'N') || contains(ss,'n') || containsDigit(ss)){
+					for (int i = 0; i < ss.length(); i++){
+						characterList.poll();
+					}
+				}
+				else if(ss.length() == sequenceLength){
+					characterList.poll();
+					return ss;
 				}
 			}
-			else if(ss.length() == sequenceLength){
-				characterList.poll();
-				return ss;
-			}
-		}
 		}
 		catch(EOFException e){
 			return "";

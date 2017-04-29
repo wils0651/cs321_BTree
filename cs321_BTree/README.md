@@ -28,5 +28,7 @@
 - [x] Search: rebuild BTree? no
 - [ ] Search seems to have an error
 - [x] BTree: file offset for root is wrong
+- [ ] BTree: no file offsets for root's children
 - [ ] Cache:
 - [ ] debugDump
+- [ ] test4.gbk error

@@ -51,7 +51,7 @@ public class Parser {
 				}
 			}
 
-			if(contains(ss,'N') || contains(ss, ' ') || contains(ss, '\n') || 
+			if(contains(ss,'N') || contains(ss,'n') || contains(ss, ' ') || contains(ss, '\n') || 
 					containsDigit(ss) || contains(ss, '\t') || contains(ss, '\r')){
 
 				for (int i = 0; i < ss.length(); i++){
@@ -117,8 +117,9 @@ public class Parser {
 
 	/**
 	 * method to return the next sub sequence as a long
+	 * @throws Exception 
 	 */
-	public long getNextKey() throws IOException {
+	public long getNextKey() throws Exception {
 		String ss = nextSubSequence();
 		if(ss.length() < sequenceLength){
 			return -1;

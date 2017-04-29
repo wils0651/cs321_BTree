@@ -15,8 +15,9 @@ public class KeyStringConverter {
 	 * @param subsequence
 	 * @param sequenceLength
 	 * @return a long that represents the sequence
+	 * @throws Exception 
 	 */
-	public long stringToKey(String subsequence, int sequenceLength) {
+	public long stringToKey(String subsequence, int sequenceLength) throws Exception {
 		long theKey = 0;
 		subsequence = subsequence.toLowerCase();
 		int k = sequenceLength;
@@ -32,8 +33,9 @@ public class KeyStringConverter {
 	 * helper method that converts a letter DNA base to a two digit binary number
 	 * @param theBase
 	 * @return base as a number
+	 * @throws Exception 
 	 */
-	private long mapBase(String theBase) {
+	private long mapBase(String theBase) throws Exception {
 		if( theBase.equals("a") ) {
 			return 0b00;
 		} else if (theBase.equals("t")) {
@@ -44,7 +46,9 @@ public class KeyStringConverter {
 			return 0b10;
 		} else {
 			System.err.println("mapBase Error: " + theBase);
-			return -1;
+			throw new Exception();
+			//System.exit(1);
+			//return -1;
 		}
 	}
 

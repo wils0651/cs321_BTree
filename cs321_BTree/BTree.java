@@ -1,15 +1,12 @@
 import sun.misc.Queue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 
 public class BTree {
 	BTreeNode myRoot;
-	//long fileOffset;
-	//TODO: check this file offset stuff
 	long fileOffsetInitial = 4 + 4 + 4 + 8; //sequence length (int), degree (int), number of nodes (int), root file offset (long)
 	long fileOffsetInterval;
 	private File btreeFile;
@@ -173,7 +170,7 @@ public class BTree {
 				}
 
 				rightNode.setParent(myparent);
-				System.out.println("this add?");
+				System.out.println("this add?");	//TODO: remove?
 				System.out.println(myparent.childRear);
 				myparent.addChild(rightNode);
 

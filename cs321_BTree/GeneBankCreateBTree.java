@@ -12,6 +12,7 @@ public class GeneBankCreateBTree {
 	private Parser gbkParser; //parser
 	private String filename;
 	private BTree theBTree;
+	private KeyStringConverter ksConverter;
 
 	/*
 	 * Usage:
@@ -38,6 +39,7 @@ public class GeneBankCreateBTree {
 		String theFilename = filename+".btree.data." + k +"." +t;	//output filename?
 		
 		theBTree = new BTree(degree, theFilename);
+		ksConverter = new KeyStringConverter();
 	}
 
 	
@@ -221,7 +223,7 @@ public class GeneBankCreateBTree {
 			//System.out.println(" in binary: "+Long.toBinaryString(testBases));
 			nextKey = gbkParser.getNextKey();
 			if (nextKey != -1){
-			System.out.println(gbkParser.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
+			System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
 			theBTree.insert(nextKey);
 			theBTree.traverseTree();
 			}
@@ -267,7 +269,7 @@ public class GeneBankCreateBTree {
 			String testString = gbkParser.nextSubSequence();	//TODO: remove
 			System.out.print(countSeq);
 			System.out.print(", testString: " + testString); 	//TODO: remove
-			long testBases = gbkParser.stringToKey(testString, sequenceLength); 	//TODO: remove
+			long testBases = ksConverter.stringToKey(testString, sequenceLength); 	//TODO: remove
 			System.out.println(" in binary: "+Long.toBinaryString(testBases));
 
 			//fileWriter.writeLong(elKey);		//Writes a long to the file as eight bytes, high byte first.
@@ -288,7 +290,7 @@ public class GeneBankCreateBTree {
 			System.out.print("elLong: "+elLong);
 			//long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
 			//					System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
-			System.out.println(", testing bases: " + gbkParser.keyToString(elLong, sequenceLength));
+			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
 		}
 		fileReader.close();		//close the fileReader
 		
@@ -301,7 +303,7 @@ public class GeneBankCreateBTree {
 			System.out.print("elLong: "+elLong);
 			//long losBits = (elLong>>2*sequenceLength*(i+1)) & (~(~0<<2*sequenceLength*(i+1)));
 			//					System.out.println("testing bases: " + keyToString(losBits, sequenceLength));
-			System.out.println(", testing bases: " + gbkParser.keyToString(elLong, sequenceLength));
+			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
 		}
 		fileReader2.close();		//close the fileReader
 	}

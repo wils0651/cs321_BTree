@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Scanner;
 
-import javax.sound.midi.Sequence;
-
 import sun.misc.Queue;
 
 public class GeneBankSearch {
@@ -17,7 +15,8 @@ public class GeneBankSearch {
 	private int sequenceLength;
 	private long fileOffsetRoot;//offset of the rootnode
 	private int numNodes;
-	private RandomAccessFile fileReader;
+	private static RandomAccessFile fileReader;
+	private KeyStringConverter ksConverter;
 
 
 	/*
@@ -33,14 +32,17 @@ public class GeneBankSearch {
 	 * The search returns the frequency of occurrence of the query string
 	 */
 
-	public GeneBankSearch(String bTreeFilename, String queryFilename, int debugMode) {
+	public GeneBankSearch(String bTreeFilename, String queryFilename, int debugMode) throws FileNotFoundException {
 		this.bTreeFilename = bTreeFilename;
 		this.queryFilename = queryFilename;
 		this.debugMode = debugMode;
+		ksConverter = new KeyStringConverter();
+		String mode = "r";
+		fileReader = new RandomAccessFile(bTreeFilename, mode);
 
 	}
 
-	public static void main(String[] args) throws FileNotFoundException, InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		if (args.length < 2 || args.length > 3) {
 			printUsage();
 		}
@@ -83,6 +85,10 @@ public class GeneBankSearch {
 		gbs.readMetadata();
 
 		gbs.readFile();
+		
+		gbs.searchQueries();
+		
+		fileReader.close();
 
 
 
@@ -133,13 +139,13 @@ public class GeneBankSearch {
 
 	//		public BTreeNode readFile() {
 	public void readFile() throws InterruptedException {
-		String mode = "r";			//rw is read write
+		//String mode = "r";			//rw is read write
 		//int numNodes;				//number of nodes in the full file
 		//long fileOffsetRoot;		//fileoffset of the root
 
 
 		try{ 
-			fileReader = new RandomAccessFile(bTreeFilename, mode);
+			//fileReader = new RandomAccessFile(bTreeFilename, mode);
 			fileReader.seek(0);
 			numNodes = fileReader.readInt();	// the number of keys in the long
 			fileOffsetRoot = fileReader.readLong();
@@ -151,7 +157,7 @@ public class GeneBankSearch {
 			System.out.println("1 appears " + searchKey(1, fileOffsetRoot) + " times");
 			System.out.println("386 appears " + searchKey(386, fileOffsetRoot) + " times");
 
-			fileReader.close();
+			//fileReader.close();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -162,6 +168,7 @@ public class GeneBankSearch {
 	}
 
 	public int searchKey(long key, long fileOffset) throws IOException{
+		
 		fileReader.seek(fileOffset);
 
 		int numberOfKeys;			//number of keys in a node
@@ -267,30 +274,27 @@ public class GeneBankSearch {
 
 		traverseTreeRecursive(q,nodeCount);
 	}
+	
+	public void searchQueries() throws IOException {
+		System.out.println("queryFilename: "+queryFilename);
+		File queryFile = new File(queryFilename);
+		Scanner fileScan = new Scanner(queryFile);
+		System.out.println("Query and Frequency");
+		int totalSequences = 0;
 
-	//
-	//				for(int i = 0; i < (2*t-1); i += 1) {
-	//					if (i < rear) {
-	//						fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
-	//						fileWriter.writeInt(keys[i].frequency);
-	//					} else {
-	//						fileWriter.writeLong(0);
-	//						fileWriter.writeInt(0);
-	//					}
-	//				}
-	//				for(int i = 0; i < childRear; i += 1) {
-	//					if(i<rear) {
-	//						fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
-	//					} else {
-	//						fileWriter.writeLong(0);
-	//					}
-	//				}
-	//				fileWriter.close();
-	//			} catch (IOException e) {
-	//				// TODO Auto-generated catch block
-	//				e.printStackTrace();
-	//
-	//			}
+		while(fileScan.hasNext()) {
+			String queryString = fileScan.nextLine();
+			Long queryLong = ksConverter.stringToKey(queryString, sequenceLength);
+			int queryFreq = searchKey(queryLong, fileOffsetRoot);
+			System.out.println(queryString + ": " + queryFreq);
+			if(queryFreq != 0) {
+				totalSequences += queryFreq;
+			}
+		
+		}
+		fileScan.close();
+		System.out.println("Total Sequences found: "+totalSequences);
+	}
 
 
 }

@@ -7,7 +7,7 @@ import java.util.Scanner;
 import sun.misc.Queue;
 
 public class GeneBankSearch {
-	private String bTreeFilename;
+	//private String bTreeFilename;
 	private String queryFilename;
 	private int debugMode;
 
@@ -33,7 +33,7 @@ public class GeneBankSearch {
 	 */
 
 	public GeneBankSearch(String bTreeFilename, String queryFilename, int debugMode) throws FileNotFoundException {
-		this.bTreeFilename = bTreeFilename;
+		//this.bTreeFilename = bTreeFilename;
 		this.queryFilename = queryFilename;
 		this.debugMode = debugMode;
 		ksConverter = new KeyStringConverter();
@@ -42,6 +42,12 @@ public class GeneBankSearch {
 
 	}
 
+	/**
+	 * main method
+	 * @param args
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws InterruptedException, IOException {
 		if (args.length < 2 || args.length > 3) {
 			printUsage();
@@ -63,9 +69,6 @@ public class GeneBankSearch {
 			System.exit(1);
 		}
 
-
-
-
 		int thisDebugMode = 0;
 		if (args.length > 2) {
 			//TODO: change if another Debug level is added
@@ -77,14 +80,12 @@ public class GeneBankSearch {
 
 		GeneBankSearch gbs = new GeneBankSearch(thisBTreeFilename, thisQueryFilename, thisDebugMode);
 
-		int fileNameLength = thisQueryFilename.length();
-		//gbs.sequenceLength = Integer.parseInt(thisQueryFilename.substring(fileNameLength-1, fileNameLength) );
-		gbs.sequenceLength = 6;
 
-
-		gbs.readMetadata();
+		//gbs.readMetadata();
 
 		gbs.readFile();
+		
+		gbs.traverseTree();
 		
 		gbs.searchQueries();
 		
@@ -118,55 +119,67 @@ public class GeneBankSearch {
 		System.exit(1);
 	}
 
-	//TODO: move to Search?
-	/**
-	 * @throws FileNotFoundException 
-	 * 
-	 */
-	private void readMetadata() throws FileNotFoundException {
-		String fileName = "BTreeMetadata.txt";
-		File theFile = new File(fileName);
-		Scanner fileScan = new Scanner(theFile);
-
-		//String gbkFileName = fileScan.nextLine();
-		degree = Integer.parseInt(fileScan.nextLine() );
-		sequenceLength = Integer.parseInt(fileScan.nextLine() );
-		fileOffsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
-		System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
-		numNodes= Integer.parseInt(fileScan.nextLine() );	//
-		System.out.println("numNodes: " + numNodes);
-	}
+//	/**
+//	 * I put all of this info into the b tree file
+//	 * @throws FileNotFoundException 
+//	 * 
+//	 */
+//	private void readMetadata() throws FileNotFoundException {
+//		String fileName = "BTreeMetadata.txt";
+//		File theFile = new File(fileName);
+//		Scanner fileScan = new Scanner(theFile);
+//
+//		//String gbkFileName = fileScan.nextLine();
+//		//degree = Integer.parseInt(fileScan.nextLine() );
+//		int asequenceLength = Integer.parseInt(fileScan.nextLine() );
+//		long afileOffsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
+//		//System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
+//		int anumNodes= Integer.parseInt(fileScan.nextLine() );	//
+//		//System.out.println("numNodes: " + numNodes);
+//		fileScan.close();
+//	}
 
 	//		public BTreeNode readFile() {
+	
+	/**
+	 * 
+	 * @throws InterruptedException
+	 */
 	public void readFile() throws InterruptedException {
-		//String mode = "r";			//rw is read write
-		//int numNodes;				//number of nodes in the full file
-		//long fileOffsetRoot;		//fileoffset of the root
+		//File Header Structure:
+		//sequence length (int), degree (int), number of nodes (int), root file offset (long)
 
 
 		try{ 
-			//fileReader = new RandomAccessFile(bTreeFilename, mode);
 			fileReader.seek(0);
+			sequenceLength = fileReader.readInt();	//length of base sequence
+			degree = fileReader.readInt();		// the degree of the B Tree nodes
 			numNodes = fileReader.readInt();	// the number of keys in the long
 			fileOffsetRoot = fileReader.readLong();
+			
+			System.out.println("sequenceLength: " + sequenceLength);
+			System.out.println("degree: " + degree);
 			System.out.println("numNodes: " + numNodes);
 			System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
 
-			System.out.println("1540 appears " + searchKey(1540, fileOffsetRoot) + " times");
-			System.out.println("2949 appears " + searchKey(2949, fileOffsetRoot) + " times");
-			System.out.println("1 appears " + searchKey(1, fileOffsetRoot) + " times");
-			System.out.println("386 appears " + searchKey(386, fileOffsetRoot) + " times");
-
-			//fileReader.close();
+//			System.out.println("1540 appears " + searchKey(1540, fileOffsetRoot) + " times");
+//			System.out.println("2949 appears " + searchKey(2949, fileOffsetRoot) + " times");
+//			System.out.println("1 appears " + searchKey(1, fileOffsetRoot) + " times");
+//			System.out.println("386 appears " + searchKey(386, fileOffsetRoot) + " times");
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
 	}
 
+	/**
+	 * method to search the b tree for sequences
+	 * @param key
+	 * @param fileOffset
+	 * @return
+	 * @throws IOException
+	 */
 	public int searchKey(long key, long fileOffset) throws IOException{
 		
 		fileReader.seek(fileOffset);
@@ -275,8 +288,12 @@ public class GeneBankSearch {
 		traverseTreeRecursive(q,nodeCount);
 	}
 	
+	/**
+	 * method to search for sequences in the query file and print out the 
+	 * frequency of occurrence to the console
+	 * @throws IOException
+	 */
 	public void searchQueries() throws IOException {
-		System.out.println("queryFilename: "+queryFilename);
 		File queryFile = new File(queryFilename);
 		Scanner fileScan = new Scanner(queryFile);
 		System.out.println("Query and Frequency");

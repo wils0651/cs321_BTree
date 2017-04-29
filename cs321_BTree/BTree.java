@@ -10,14 +10,16 @@ public class BTree {
 	BTreeNode myRoot;
 	//long fileOffset;
 	//TODO: check this file offset stuff
-	long fileOffsetInitial = 4 + 4 + 8; //sequence length (int), number of nodes (int), root file offset (long)
+	long fileOffsetInitial = 4 + 4 + 4 + 8; //sequence length (int), degree (int), number of nodes (int), root file offset (long)
 	long fileOffsetInterval;
 	private File btreeFile;
 	private int t;	//degree
+	private int sequenceLength;
 	private int numNodes;
 
-	public BTree(int t, String filename){
+	public BTree(int t, int sequenceLength, String filename){
 		this.t = t;
+		this.sequenceLength = sequenceLength;
 		btreeFile = new File(filename);
 		numNodes = 1;
 		fileOffsetInterval = 4 + 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);	//rear, keys, frequency, file offsets
@@ -356,6 +358,7 @@ public class BTree {
 		 */
 		public void writeNode() throws IOException {
 			// TODO design file format
+			//sequence length (int), degree (int), number of nodes (int), root file offset (long)
 			//String theFilename = "theTestFile.txt";
 			//File outputFile = new File(theFilename);
 			String mode = "rwd";			//rw is read write
@@ -364,8 +367,10 @@ public class BTree {
 				// General B Tree Info
 				fileWriter.seek(0);
 				//System.out.println("rear: "+rear);
+				fileWriter.writeInt(sequenceLength);	//sequenceLength
+				fileWriter.writeInt(t);			//degree
 				fileWriter.writeInt(numNodes);	// the total number of nodes, TN: I dont think its necessary to print this
-				fileWriter.writeLong(getRoot().getFileOffset());  
+				fileWriter.writeLong(getRoot().getFileOffset());	//root file offset
 
 				// Individual Node Info:
 				fileWriter.seek(fileOffset);

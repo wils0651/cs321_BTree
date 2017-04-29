@@ -34,11 +34,11 @@ public class GeneBankCreateBTree {
 		this.filename = filename;
 		this.sequenceLength = sequenceLength;
 		
-		int k = sequenceLength;
-		int t = degree;
-		String theFilename = filename+".btree.data." + k +"." +t;	//output filename?
+		//int k = sequenceLength;
+		//int t = degree;
+		String theFilename = filename+".btree.data." + sequenceLength +"." +degree;	//output filename?
 		
-		theBTree = new BTree(degree, theFilename);
+		theBTree = new BTree(degree, sequenceLength, theFilename);
 		ksConverter = new KeyStringConverter();
 	}
 
@@ -86,13 +86,6 @@ public class GeneBankCreateBTree {
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
 
 		gbcbt.sendToParser(); 
-
-		//TODO: Put stuff into a Btree
-
-//		gbcbt.testWrite();
-		
-
-		//TODO: Put stuff into a Btree
 
 		//gbcbt.testWrite();
 		gbcbt.writeMetadata();

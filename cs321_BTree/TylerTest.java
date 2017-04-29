@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class TylerTest {
 
 	public static void main(String[] args) throws InterruptedException, IOException {
-		BTree tylerTree = new BTree(4, "TyTest.txt");
+		BTree tylerTree = new BTree(4,3, "TyTest.txt");
 
 		if(Integer.parseInt(args[0]) == 1){
 			Scanner scan = new Scanner(System.in);

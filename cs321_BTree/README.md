@@ -25,10 +25,10 @@
 - [x] BTree node: write to disk - design file format
 - [x] Create: metadata file
 - [x] Search: search algorithm
-- [x] Search: rebuild BTree? no
-- [ ] Search seems to have an error
+- [x] Search: rebuild BTree?
+- [ ] Search seems to have an error for some sequence lengths
 - [x] BTree: file offset for root is wrong
-- [ ] BTree: no file offsets for root's children
-- [ ] Cache:
-- [ ] debugDump
-- [ ] test4.gbk error
+- [ ] BTree: error with file offsets for root's children
+- [ ] Cache: need to implement
+- [ ] debugDump - need to implement
+- [ ] test4.gbk error - this test file has no DNA sequences

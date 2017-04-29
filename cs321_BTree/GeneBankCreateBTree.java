@@ -178,23 +178,28 @@ public class GeneBankCreateBTree {
 		}
 	}
 
-	//TODO: move to Search?
+//	//TODO: move to Search?
+//	/**
+//	 * @throws FileNotFoundException 
+//	 * 
+//	 */
+//	private void readMetadata() throws FileNotFoundException {
+//		String fileName = "BTreeMetadata.txt";
+//		File theFile = new File(fileName);
+//		Scanner fileScan = new Scanner(theFile);
+//		String gbkFileName = fileScan.nextLine();
+//		int degree = Integer.parseInt(fileScan.nextLine() );
+//		int sequenceLength = Integer.parseInt(fileScan.nextLine() );
+//		long offsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
+//		int numNodes= Integer.parseInt(fileScan.nextLine() );	//
+//	}
+
+	
 	/**
-	 * @throws FileNotFoundException 
-	 * 
+	 * method to ssend the gene base file to the parser and B Tree
+	 * @throws IOException
+	 * @throws InterruptedException
 	 */
-	private void readMetadata() throws FileNotFoundException {
-		String fileName = "BTreeMetadata.txt";
-		File theFile = new File(fileName);
-		Scanner fileScan = new Scanner(theFile);
-		String gbkFileName = fileScan.nextLine();
-		int degree = Integer.parseInt(fileScan.nextLine() );
-		int sequenceLength = Integer.parseInt(fileScan.nextLine() );
-		long offsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
-		int numNodes= Integer.parseInt(fileScan.nextLine() );	//
-
-	}
-
 	public void sendToParser() throws IOException, InterruptedException {
 		File theFile = new File(filename);
 		//TODO: send file to parser

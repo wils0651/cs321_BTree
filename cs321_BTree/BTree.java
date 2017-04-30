@@ -13,13 +13,21 @@ public class BTree {
 	private int t;	//degree
 	private int sequenceLength;
 	private int numNodes;
-
-	public BTree(int t, int sequenceLength, String filename){
+	private int cache;
+	private Cache theCache;
+	
+	public BTree(int cache, int cacheSize, int t, int sequenceLength, String filename){
 		this.t = t;
 		this.sequenceLength = sequenceLength;
 		btreeFile = new File(filename);
 		numNodes = 1;
 		fileOffsetInterval = 4 + 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);	//rear, keys, frequency, file offsets
+		if(cache ==1){
+			theCache = new Cache(cacheSize);
+		}
+		else{
+			theCache = null
+		}
 	}
 
 	public int getSequenceLength() {
@@ -367,6 +375,7 @@ public class BTree {
 			//File outputFile = new File(theFilename);
 			String mode = "rwd";			//rw is read write
 			try{ 
+				Cache.addObject(this);
 				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
 				// General B Tree Info
 				fileWriter.seek(0);

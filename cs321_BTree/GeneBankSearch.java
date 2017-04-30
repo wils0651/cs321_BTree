@@ -57,12 +57,19 @@ public class GeneBankSearch {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if (args.length < 2 || args.length > 3) {
+		if (args.length < 3  || args.length > 5) {
 			printUsage();
+		}
+		
+		if(Integer.parseInt(args[0]) == 1){
+			//TODO: use cache
+		}
+		else{
+			//TODO: dont use cache
 		}
 
 		// Check <btree file>
-		String thisBTreeFilename = args[0];
+		String thisBTreeFilename = args[1];
 		File theFile = new File(thisBTreeFilename);
 		if(!theFile.exists()) {
 			System.err.println("BTree file not found.");
@@ -70,7 +77,7 @@ public class GeneBankSearch {
 		}
 
 		//check <query file>
-		String thisQueryFilename = args[1];
+		String thisQueryFilename = args[2];
 		File theQueryFile = new File(thisQueryFilename);
 		if(!theQueryFile.exists()) {
 			System.err.println("Query file not found.");
@@ -78,7 +85,7 @@ public class GeneBankSearch {
 		}
 
 		int thisDebugMode = 0;
-		if (args.length > 2) {
+		if ((args.length > 3 && Integer.parseInt(args[0]) == 0) || args.length == 5) {
 			//TODO: change if another Debug level is added
 			thisDebugMode = Integer.parseInt(args[2]);
 			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {

@@ -28,26 +28,35 @@ public class GeneBankCreateBTree {
 	 * <frequency> <DNA string>. The dump file contains frequency and DNA string
 	 * (corresponding to the key stored) in an inorder traversal.
 	 */
-	public GeneBankCreateBTree(int degree, String filename, int sequenceLength) throws IOException{
+	public GeneBankCreateBTree(int cache, int cacheSize, int degree, String filename, int sequenceLength) throws IOException{
 		this.degree = degree;
 		this.filename = filename;
 		this.sequenceLength = sequenceLength;
-		
+
 		//int k = sequenceLength;
 		//int t = degree;
 		String theFilename = filename+".btree.data." + sequenceLength +"." +degree;	//output filename?
-		
-		theBTree = new BTree(degree, sequenceLength, theFilename);
+
+		theBTree = new BTree(cache, cacheSize, degree, sequenceLength, theFilename);
 		ksConverter = new KeyStringConverter();
 	}
 
-	
+
 	public static void main(String args[]) throws Exception {
-		if (args.length < 3) {
+		if (args.length < 4) {
 			printUsage();
 		}
 
-		int thisDegree = Integer.parseInt(args[0]);
+		int thisCache = Integer.parseInt(args[0]);
+		if(thisCache == 1 || thisCache == 0){
+
+		}
+		else{
+			throw new IllegalArgumentException("Improper Cache Specification");
+		}
+		int thisDegree = Integer.parseInt(args[1]);
+
+
 		if(thisDegree < 0) {
 			throw new IllegalArgumentException("Improper Degree Selection");
 		} else if(thisDegree == 0) {
@@ -55,7 +64,7 @@ public class GeneBankCreateBTree {
 		}
 
 		//check gbk file
-		String thisFilename = args[1];
+		String thisFilename = args[2];
 		String fileSuffix = thisFilename.substring((thisFilename.length()-4), thisFilename.length());
 		File theFile = new File(thisFilename);
 		if(!fileSuffix.equals(".gbk")) {	//make sure .gbk file
@@ -66,14 +75,24 @@ public class GeneBankCreateBTree {
 			System.exit(1);
 		}
 
-		int ThisSequenceLength = Integer.parseInt(args[2]);
+		int ThisSequenceLength = Integer.parseInt(args[3]);
 		if(ThisSequenceLength <= 0 ) {
 			throw new IllegalArgumentException("Improper Sequence Length Specification");
 		}
 
+
+		int thisCacheSize = 0;
+		if(thisCache == 1){
+			thisCacheSize = Integer.parseInt(args[4]);
+			if(thisCacheSize <= 0 ) {
+				throw new IllegalArgumentException("Improper Cache Size Specification");
+			}
+		}
+
+
 		int debugMode = 0;
-		if (args.length > 3) {
-			debugMode = Integer.parseInt(args[3]);
+		if ((args.length == 4 && Integer.parseInt(args[0]) == 0) || args.length == 5) {
+			debugMode = Integer.parseInt(args[4]);
 			if(!(debugMode == 0 || debugMode == 1)) {
 				throw new IllegalArgumentException("Improper Debug Mode Selection");
 			}
@@ -81,8 +100,8 @@ public class GeneBankCreateBTree {
 
 
 		//Create an object, pass int the degree, output filename,and sequence length
-		
-		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisDegree, thisFilename, ThisSequenceLength);
+
+		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisCache, thisCacheSize, thisDegree, thisFilename, ThisSequenceLength);
 
 		gbcbt.sendToParser(); 
 
@@ -92,6 +111,7 @@ public class GeneBankCreateBTree {
 		
 		gbcbt.debugDump();
 		
+
 
 	}
 
@@ -192,7 +212,7 @@ public class GeneBankCreateBTree {
 			writer1.println(sequenceLength);	//
 			writer1.println(theBTree.getRoot().getFileOffset());	//offset of the rootnode
 			writer1.println(theBTree.numNodes());	//numberOfNodes
-			
+
 			writer1.close();
 		} catch (IOException e) {
 			System.err.println("Error creating file: " + fileName);
@@ -200,7 +220,7 @@ public class GeneBankCreateBTree {
 		}
 	}
 
-	
+
 	/**
 	 * method to send the gene base file to the parser and B Tree
 	 * @throws Exception 
@@ -216,7 +236,7 @@ public class GeneBankCreateBTree {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		long nextKey;
 		while(gbkParser.hasMore() ) {
 			nextKey = gbkParser.getNextKey();
@@ -236,7 +256,7 @@ public class GeneBankCreateBTree {
 	 */
 	public void testWrite() throws Exception {
 		//TODO: delete this method
-		
+
 		File theFile = new File(filename);
 		//TODO: send file to parser
 		FileInputStream theFileStream;
@@ -247,7 +267,7 @@ public class GeneBankCreateBTree {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		//TODO: write to disk.
 		int k = sequenceLength;
 		int t = degree;
@@ -286,7 +306,7 @@ public class GeneBankCreateBTree {
 			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
 		}
 		fileReader.close();		//close the fileReader
-		
+
 		RandomAccessFile fileReader2 = new RandomAccessFile(outputFile, "r");
 		System.out.println("Seek again");
 		fileReader2.seek(0);

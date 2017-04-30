@@ -88,7 +88,7 @@ public class GeneBankCreateBTree {
 
 		//gbcbt.testWrite();
 		gbcbt.writeMetadata();
-		
+		System.out.println(gbcbt.theBTree.myRoot.getFileOffset());
 		
 
 	}
@@ -186,22 +186,6 @@ public class GeneBankCreateBTree {
 			System.exit(1);
 		}
 	}
-
-//	//TODO: move to Search?
-//	/**
-//	 * @throws FileNotFoundException 
-//	 * 
-//	 */
-//	private void readMetadata() throws FileNotFoundException {
-//		String fileName = "BTreeMetadata.txt";
-//		File theFile = new File(fileName);
-//		Scanner fileScan = new Scanner(theFile);
-//		String gbkFileName = fileScan.nextLine();
-//		int degree = Integer.parseInt(fileScan.nextLine() );
-//		int sequenceLength = Integer.parseInt(fileScan.nextLine() );
-//		long offsetRoot = Long.parseLong(fileScan.nextLine() );//offset of the rootnode
-//		int numNodes= Integer.parseInt(fileScan.nextLine() );	//
-//	}
 
 	
 	/**

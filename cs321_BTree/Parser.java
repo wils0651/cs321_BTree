@@ -49,9 +49,7 @@ public class Parser {
 
 				if(contains(ss, '/')) {
 					characterList.poll();
-					System.out.println("found a slash");
 					if(contains(ss, '/')) {
-						System.out.println("found a second slash and skipping header");
 						skipHeader();
 					}
 				}

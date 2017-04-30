@@ -1,3 +1,4 @@
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -156,10 +157,10 @@ public class GeneBankSearch {
 			System.out.println("numNodes: " + numNodes);
 			System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
 
-//			System.out.println("1540 appears " + searchKey(1540, fileOffsetRoot) + " times");
-//			System.out.println("2949 appears " + searchKey(2949, fileOffsetRoot) + " times");
-//			System.out.println("1 appears " + searchKey(1, fileOffsetRoot) + " times");
-//			System.out.println("386 appears " + searchKey(386, fileOffsetRoot) + " times");
+			System.out.println("1540 appears " + searchKey(1540, fileOffsetRoot) + " times");
+			System.out.println("2949 appears " + searchKey(2949, fileOffsetRoot) + " times");
+			System.out.println("1 appears " + searchKey(1, fileOffsetRoot) + " times");
+			System.out.println("386 appears " + searchKey(382, fileOffsetRoot) + " times");
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -258,6 +259,7 @@ public class GeneBankSearch {
 		frequencies = new int[numberOfKeys];
 		childOffsets = new long[numberOfKeys+1];
 
+		try{
 		for(int i = 0; i < (2*degree-1); i += 1) {
 			if ( i < numberOfKeys) {
 				keys[i] = fileReader.readLong();
@@ -284,7 +286,10 @@ public class GeneBankSearch {
 //				System.out.println("junk: "+junk);
 			}
 		}
-
+		}
+		catch(EOFException e){
+			System.out.println("end of file");
+		}
 		//traverseTreeRecursive(q,nodeCount);	//TODO: fix?
 		traverseTreeRecursive(nodeCount);
 	}

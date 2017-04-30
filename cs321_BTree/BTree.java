@@ -22,6 +22,10 @@ public class BTree {
 		fileOffsetInterval = 4 + 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);	//rear, keys, frequency, file offsets
 	}
 
+	public int getSequenceLength() {
+		return sequenceLength;
+	}
+
 	public void insert(long sskey) throws IOException{			//doesn't need to return anything but we can if we want!
 		if(myRoot == null){
 			myRoot = new BTreeNode();
@@ -137,6 +141,7 @@ public class BTree {
 
 			if(duplicate != null){
 				duplicate.incrementFreq();
+				this.writeNode();
 				return;
 			}
 
@@ -147,22 +152,21 @@ public class BTree {
 					BTreeObject removeKey = remove(middleIndex);
 					myparent.setSplitInsert(true);
 					myparent.insert(removeKey);
-					numNodes++;
 				}
 				else{
 					BTreeObject removeKey = keys[middleIndex];	
 					remove(middleIndex);
+					numNodes++;
 					BTreeNode splitNode = createNode(removeKey);
 					myRoot = splitNode;
 					this.setParent(splitNode);
 					myparent.addChild(this);
-					numNodes += 2;
 				}
 
 
 				BTreeObject removeObject = remove(middleIndex);
+				numNodes++;
 				BTreeNode rightNode = createNode(removeObject);   //moves half the elements to a new node
-
 
 				while(keys[middleIndex] != null){
 					removeObject = remove(middleIndex);
@@ -204,6 +208,9 @@ public class BTree {
 				}
 
 				splitInsert = false;
+				if(myparent != null){
+				myparent.writeNode();
+				}
 				writeNode();
 			}
 

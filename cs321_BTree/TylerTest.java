@@ -56,7 +56,7 @@ public class TylerTest {
 			System.out.println();
 			System.out.println("---------------------");
 			System.out.println();
-			for (int i=0; i< 229; i++){
+			for (int i=0; i< 30; i++){
 				tylerTree.insert(i);
 				tylerTree.traverseTree();
 			}
@@ -64,7 +64,7 @@ public class TylerTest {
 			tylerTree.insert(29);
 
 			tylerTree.insert(29);
-			
+			tylerTree.writeCache();
 			writeMetadata(tylerTree);
 			System.out.println(tylerTree.getRoot().getFileOffset());
 
@@ -104,6 +104,7 @@ public class TylerTest {
 						tylerTree.insert(key);
 					}
 				}
+				tylerTree.writeCache();
 				System.out.println();
 				tylerTree.traverseTree();
 			}
@@ -127,10 +128,12 @@ public class TylerTest {
 			System.out.println("numNodes: " + numNodes);
 			System.out.println("fileReadOffset "+ rootReadOffset);
 
-			for (int i=0; i< 229; i++){
+			for (int i=0; i< 30; i++){
 				System.out.println("number of occurences of " + i +": " + searchKey(i, rootReadOffset));
 			}
 
+			System.out.println("number of occurences of " + 220 +": " + searchKey(220, rootReadOffset));
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -50,13 +50,13 @@ public class TylerTest {
 		sequenceLength = 3;
 
 
-		BTree tylerTree = new BTree(degree, sequenceLength, "TyTest.txt");
+		BTree tylerTree = new BTree(1, 100, degree, sequenceLength, "TyTest.txt");
 		if(Integer.parseInt(args[0]) == 1){
 			Scanner scan = new Scanner(System.in);		
 			System.out.println();
 			System.out.println("---------------------");
 			System.out.println();
-			for (int i=0; i< 29; i++){
+			for (int i=0; i< 229; i++){
 				tylerTree.insert(i);
 				tylerTree.traverseTree();
 			}
@@ -127,10 +127,9 @@ public class TylerTest {
 			System.out.println("numNodes: " + numNodes);
 			System.out.println("fileReadOffset "+ rootReadOffset);
 
-			System.out.println("0 appears " + searchKey(0, rootReadOffset) + " times");
-			System.out.println("15 appears " + searchKey(15, rootReadOffset) + " times");
-			System.out.println("20 appears " + searchKey(20, rootReadOffset) + " times");
-			System.out.println("29 appears " + searchKey(29, rootReadOffset) + " times");
+			for (int i=0; i< 229; i++){
+				System.out.println("number of occurences of " + i +": " + searchKey(i, rootReadOffset));
+			}
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

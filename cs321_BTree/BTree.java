@@ -182,7 +182,7 @@ public class BTree {
 				}
 
 				rightNode.setParent(myparent);
-				System.out.println("this add?");	//TODO: remove?
+				//System.out.println("this add?");	//TODO: remove?
 				System.out.println(myparent.childRear);
 				myparent.addChild(rightNode);
 

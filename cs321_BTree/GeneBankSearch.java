@@ -69,7 +69,7 @@ public class GeneBankSearch {
 		}
 
 		// Check <btree file>
-		String thisBTreeFilename = args[1];
+		String thisBTreeFilename = args[1]; 
 		File theFile = new File(thisBTreeFilename);
 		if(!theFile.exists()) {
 			System.err.println("BTree file not found.");

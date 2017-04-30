@@ -90,6 +90,8 @@ public class GeneBankCreateBTree {
 		gbcbt.writeMetadata();
 		System.out.println(gbcbt.theBTree.myRoot.getFileOffset());
 		
+		gbcbt.debugDump();
+		
 
 	}
 
@@ -119,27 +121,38 @@ public class GeneBankCreateBTree {
 	/**
 	 * method to write to a textfile named dump. Uses a hashmap to count the 
 	 * frequency of sequences in an inorder traversal.
+	 * @throws InterruptedException 
 	 */
-	private void debugDump() {
+	private void debugDump() throws InterruptedException {
 		/*
 		 * The program writes a text file named dump, that has the following line format:
 		 * <frequency> <DNA string>. The dump file contains frequency and DNA string
 		 * (corresponding to the key stored) in an inorder traversal.
 		 */
 		//TODO: 
-		String fileName = "dump";
-
-		try{
-			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
-			//writer1.println(gbkFileName);	//name of the BTree file
-			writer1.println("TODO");	//degree of tree;
-			
-			writer1.close();
-		} catch (IOException e) {
-			System.err.println("Error creating file: " + fileName);
-			System.exit(1);
-		}
+		System.out.println(theBTree.inorderTraverseTree());
+		
+//		String fileName = "dump";
+//
+//		try{
+//			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
+//			//writer1.println(gbkFileName);	//name of the BTree file
+//			writer1.println("TODO");	//degree of tree;
+//			
+//			writer1.close();
+//		} catch (IOException e) {
+//			System.err.println("Error creating file: " + fileName);
+//			System.exit(1);
+//		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 
 	/**
@@ -208,7 +221,7 @@ public class GeneBankCreateBTree {
 		while(gbkParser.hasMore() ) {
 			nextKey = gbkParser.getNextKey();
 			if (nextKey != -1){
-			System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" in binary: "+Long.toBinaryString(nextKey));
+			System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" encoded: "+Long.toBinaryString(nextKey));
 			theBTree.insert(nextKey);
 			theBTree.traverseTree();
 			}

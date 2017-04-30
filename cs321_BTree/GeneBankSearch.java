@@ -54,10 +54,9 @@ public class GeneBankSearch {
 	/**
 	 * main method
 	 * @param args
-	 * @throws InterruptedException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws Exception {
 		if (args.length < 2 || args.length > 3) {
 			printUsage();
 		}
@@ -95,7 +94,7 @@ public class GeneBankSearch {
 		
 		gbs.traverseTree();
 		
-		//gbs.searchQueries();
+		gbs.searchQueries();
 		
 		fileReader.close();
 

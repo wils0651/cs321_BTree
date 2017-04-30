@@ -3,6 +3,8 @@ import sun.misc.Queue;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Stack;
 
 
 public class BTree {
@@ -13,6 +15,7 @@ public class BTree {
 	private int t;	//degree
 	private int sequenceLength;
 	private int numNodes;
+	private KeyStringConverter ksConverter;
 
 	public BTree(int t, int sequenceLength, String filename){
 		this.t = t;
@@ -20,6 +23,7 @@ public class BTree {
 		btreeFile = new File(filename);
 		numNodes = 1;
 		fileOffsetInterval = 4 + 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);	//rear, keys, frequency, file offsets
+		ksConverter = new KeyStringConverter();
 	}
 
 	public int getSequenceLength() {
@@ -115,6 +119,51 @@ public class BTree {
 		return aNode;
 	}
 
+	
+	
+	public String inorderTraverseTree() throws InterruptedException {
+		Stack<BTreeNode> stack = new Stack<BTreeNode>();
+		String inOrderList = "";
+		//Queue q = new Queue<BTreeNode>();
+		System.out.println("\n===========================\n");
+		stack.push(myRoot);
+		return inorderTraverseTreeRecursive(stack, inOrderList);
+	}
+
+	public String inorderTraverseTreeRecursive(Stack<BTreeNode> stack, String inOrderList) throws InterruptedException {
+		if (stack.isEmpty()){
+			return inOrderList;
+		}
+//		BTreeNode node = q.dequeue();
+		BTreeNode node = stack.pop();
+
+		//System.out.println(node.toString());
+		BTreeObject[] theKeys = node.getKeys();
+		for(int i = 0; i < node.rear; i += 1) {
+			inOrderList += theKeys[i].getKey();
+			inOrderList += " " + theKeys[i].getFrequency();
+			inOrderList += " " + ksConverter.keyToString(theKeys[i].getKey(), sequenceLength) +"\n";
+		}
+		//inOrderList.add(node.toString());
+
+		for (int i = 0; i < node.numChildren(); i++){
+			System.out.println(node.getChildren()[i].getFileOffset());
+//			q.enqueue(node.getChildren()[i]);
+			stack.push(node.getChildren()[i]);
+		}
+
+//		traverseTreeRecursive(q);
+		return inorderTraverseTreeRecursive(stack, inOrderList);
+	}
+	
+	
+	
+	
+	
+	
+	
+/// =======================================================================	
+	
 	public class BTreeNode{
 		private BTreeNode myparent;
 		private BTreeObject[] keys;
@@ -429,6 +478,9 @@ public class BTree {
 			return ss;
 		}
 	}
+	
+///=================================================================	
+	
 	public class BTreeObject{
 		private int frequency;
 		private long key;
@@ -441,5 +493,20 @@ public class BTree {
 		public void incrementFreq(){
 			frequency++;
 		}
+		
+		public long getKey() {
+			return key;
+		}
+		
+		public int getFrequency() {
+			return frequency;
+		}
 	}
+	
+
+	
+	
+	
+	
+	
 }	

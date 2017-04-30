@@ -26,9 +26,9 @@
 - [x] Create: metadata file
 - [x] Search: search algorithm
 - [x] Search: rebuild BTree?
-- [ ] Search seems to have an error for some sequence lengths
+- [x] Search seems to have an error for some sequence lengths
 - [x] BTree: file offset for root is wrong
-- [ ] BTree: error with file offsets for root's children
+- [x] BTree: error with file offsets for root's children
 - [ ] Cache: need to implement
 - [ ] debugDump - need to implement
 - [ ] test4.gbk error - this test file has no DNA sequences

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Stack;
 
 
@@ -19,7 +20,7 @@ public class BTree {
 
 	private int cache;
 	private Cache theCache;
-	
+
 	public BTree(int cache, int cacheSize, int t, int sequenceLength, String filename){
 		this.t = t;
 		this.sequenceLength = sequenceLength;
@@ -27,6 +28,7 @@ public class BTree {
 		numNodes = 1;
 		fileOffsetInterval = 4 + 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);	//rear, keys, frequency, file offsets
 		ksConverter = new KeyStringConverter();
+		this.cache = cache;
 		if(cache ==1){
 			theCache = new Cache(cacheSize);
 		}
@@ -47,10 +49,10 @@ public class BTree {
 		myRoot.insert(new BTreeObject(sskey));
 
 		//fileOffset = btreeFile.length();	//maybe replace this code with createNode()
-//		fileOffsetInterval = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
+		//		fileOffsetInterval = 8*(2*t-1) + 4*(2*t-1) + 8*(2*t);
 		//myRoot.setFileOffset(fileOffset);
 	}
-	
+
 	public int getDegree(){
 		return t;
 	}
@@ -128,8 +130,8 @@ public class BTree {
 		return aNode;
 	}
 
-	
-	
+
+
 	public String inorderTraverseTree() throws InterruptedException {
 		Stack<BTreeNode> stack = new Stack<BTreeNode>();
 		String inOrderList = "";
@@ -143,7 +145,7 @@ public class BTree {
 		if (stack.isEmpty()){
 			return inOrderList;
 		}
-//		BTreeNode node = q.dequeue();
+		//		BTreeNode node = q.dequeue();
 		BTreeNode node = stack.pop();
 
 		//System.out.println(node.toString());
@@ -157,22 +159,247 @@ public class BTree {
 
 		for (int i = 0; i < node.numChildren(); i++){
 			System.out.println(node.getChildren()[i].getFileOffset());
-//			q.enqueue(node.getChildren()[i]);
+			//			q.enqueue(node.getChildren()[i]);
 			stack.push(node.getChildren()[i]);
 		}
 
-//		traverseTreeRecursive(q);
+		//		traverseTreeRecursive(q);
 		return inorderTraverseTreeRecursive(stack, inOrderList);
 	}
+
+	public void writeCache() throws IOException{
+		String mode = "rwd";			//rw is read write
+		try{ 
+			
+			RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
+			// General B Tree Info
+			fileWriter.seek(0);
+			//System.out.println("rear: "+rear);
+			fileWriter.writeLong(getRoot().getFileOffset());	//root file offset
+			fileWriter.writeInt(sequenceLength);	//sequenceLength
+			fileWriter.writeInt(t);			//degree
+			fileWriter.writeInt(numNodes);	// the total number of nodes
+			
+			
+			BTreeNode writeNode = null;
+			while((writeNode = theCache.removeFirst()) != null)
+				if (writeNode != null){
+
+					// Individual Node Info:
+					fileWriter.seek(writeNode.getFileOffset());
+					fileWriter.writeInt(writeNode.getRear());	//number of keys in node
+					for(int i = 0; i < (2*t-1); i += 1) {
+						if (i < writeNode.getRear()) {
+							fileWriter.writeLong(writeNode.getKeys()[i].key);		//Writes a long to the file as eight bytes, high byte first.
+							fileWriter.writeInt(writeNode.getKeys()[i].frequency);
+						} else {
+							fileWriter.writeLong(0);
+							fileWriter.writeInt(0);
+						}
+					}
+					for(int i = 0; i < 2*t; i += 1) {
+						if(i<writeNode.getChildRear()) {
+							fileWriter.writeLong(writeNode.getChildren()[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
+						} else {
+							fileWriter.writeLong(0);
+						}
+					}
+				}
+			fileWriter.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
 	
-	
-	
-	
-	
-	
-	
-/// =======================================================================	
-	
+	public class Cache {
+		private long NR1;
+		private long NR2;
+		private long NH1;
+		private long NH2;
+		private int cacheSize;
+		private LinkedList<BTreeNode> myCache1;
+		private LinkedList<BTreeNode> myCache2;
+		private boolean isDoubleLevel = false; //single or double level cache, default single
+		private int cacheSize1;
+		private int cacheSize2;
+		
+		/**
+		 * Constructor for single level cache 
+		 * @param cSize1 size of cache
+		 */
+		public Cache(int cSize1){
+			cacheSize1 = cSize1;
+			myCache1 = new LinkedList<BTreeNode>();
+			NR1 =0;
+			NH1 =0;
+			cacheSize = 0;
+			System.out.print("First level cache with ");
+			System.out.print(cSize1);
+			System.out.println(" entries has been created");
+			isDoubleLevel = false;
+		}
+		
+		/**
+		 * Constructor for 2 level cache 
+		 * @param cSize1 size of first level cache
+		 * @param cSize2 size of second level cache
+		 */
+		public Cache(int cSize1, int cSize2){
+			cacheSize1 = cSize1;
+			cacheSize2 = cSize2;
+			myCache1 = new LinkedList<BTreeNode>();
+			myCache2 = new LinkedList<BTreeNode>();
+			NR1 =0;
+			NR2 =0;
+			NH1 =0;
+			NH2 =0;
+			cacheSize = 0;
+			System.out.print("First level cache with ");
+			System.out.print(cSize1);
+			System.out.println(" entries has been created");
+			System.out.print("Second level cache with ");
+			System.out.print(cSize2);
+			System.out.println(" entries has been created");
+			isDoubleLevel = true;
+		}
+
+		/**
+		 * Checks if an object (String) is in the cache
+		 * @param aWord the string to be searched for in the cache
+		 * @return the string (aWord) or "not in cache" if not in the cache
+		 */
+		public BTreeNode getObject(BTreeNode aWord) {
+			BTreeNode returnVal = null;
+			if(myCache1.contains(aWord) || myCache2.contains(aWord)){
+				returnVal = aWord;
+			}
+			return returnVal;
+		}
+		
+		public BTreeNode removeFirst(){
+			if(cacheSize > 0){
+				cacheSize--;
+				return myCache1.removeFirst();
+			}
+			return null;
+		}
+		
+		/**
+		 * adds an object to the cache
+		 * @param bTreeNode the String object to be added to the cache
+		 */
+		public BTreeNode addObject(BTreeNode bTreeNode){
+			NR1++;
+			BTreeNode retval = null;
+			if(myCache1.contains(bTreeNode)){	//word is in 1st cache
+				NH1++;
+				retval = bTreeNode;
+				myCache1.addFirst(bTreeNode);
+				if(isDoubleLevel){
+					myCache2.remove(bTreeNode);
+					myCache2.addFirst(bTreeNode);
+				}
+			}else if(myCache1.size() >= cacheSize1){	//word is not in cache 1, cache1 is full
+				retval = myCache1.remove(cacheSize1-1);
+				myCache1.addFirst(bTreeNode);
+				if(isDoubleLevel){
+					NR2++;
+					if(myCache2.contains(bTreeNode)){		//word is in cache2
+						NH2++;
+						myCache2.remove(bTreeNode);
+						myCache2.addFirst(bTreeNode);				
+					}else if(myCache2.size() >= cacheSize2){	//word is not in cache2, cache2 is full
+						myCache2.remove(cacheSize2-1);
+						myCache2.addFirst(bTreeNode);
+					} else {							//word is not in cache2, cache2 is not full
+						myCache2.addFirst(bTreeNode);
+					}
+				}
+			} else {									//word is not in cache1, cache1 is not full
+				myCache1.addFirst(bTreeNode);
+				if(isDoubleLevel){
+					myCache2.addFirst(bTreeNode);
+				}
+			}
+			if(retval == null){
+				cacheSize++;
+			}
+			
+			return retval;
+		}
+		
+		/**
+		 * removes an object (String) from the cache
+		 * @param aWord
+		 */
+		public BTreeNode removeObject(BTreeNode aWord){
+			BTreeNode retval = null;
+			if(myCache1.contains(aWord)){
+				myCache1.remove(aWord);
+				retval = aWord;
+			}
+			if(isDoubleLevel){
+				if(myCache2.contains(aWord)){
+					myCache2.remove(aWord);
+					return aWord;
+				}
+			}
+			return retval;
+		}
+		
+		/**
+		 * clears the cache
+		 */
+		public void clearCache(){
+			myCache1.clear();
+			if(isDoubleLevel){
+				myCache2.clear();
+			}
+		}
+		
+		/**
+		 *  
+		 * @return the number of hits on cache1
+		 */
+		public long getNH1(){
+			return NH1;
+		}
+		
+		/**
+		 *  
+		 * @return the number of hits on cache2
+		 */
+		public long getNH2(){
+			return NH2;
+		}
+		
+		/**
+		 *  
+		 * @return the number of references to cache 1
+		 */
+		public long getNR1(){
+			return NR1;
+		}
+		
+		/**
+		 * 
+		 * @return the number of references to cache 2
+		 */
+		public long getNR2(){
+			return NR2;
+		}
+	}
+
+
+
+
+
+
+
+	/// =======================================================================	
+
 	public class BTreeNode{
 		private BTreeNode myparent;
 		private BTreeObject[] keys;
@@ -250,7 +477,7 @@ public class BTree {
 				childrenSort();
 				myparent.childrenSort();
 				myRoot.childrenSort();
-				
+
 				if(!myparent.equals(myRoot)){
 					myparent.writeNode();
 				}
@@ -267,7 +494,7 @@ public class BTree {
 
 				splitInsert = false;
 				if(myparent != null){
-				myparent.writeNode();
+					myparent.writeNode();
 				}
 				writeNode();
 			}
@@ -303,8 +530,8 @@ public class BTree {
 
 			for (int i = index; i < rear-1; i++){
 				if(firstTime){
-				retval = keys[index];
-				firstTime = false;
+					retval = keys[index];
+					firstTime = false;
 				}
 				keys[i] = keys[i+1];
 			}
@@ -379,6 +606,10 @@ public class BTree {
 		public int getRear(){
 			return rear;
 		}
+		
+		public int getChildRear(){
+			return childRear;
+		}
 
 		public void setRear(int rear){
 			this.rear = rear;
@@ -388,10 +619,10 @@ public class BTree {
 			return fileOffset;
 		}
 
-//		public void setFileOffset(long fileOffset) {
-//			this.fileOffset = fileOffset;
-//
-//		}
+		//		public void setFileOffset(long fileOffset) {
+		//			this.fileOffset = fileOffset;
+		//
+		//		}
 
 		public void setParent(BTreeNode parent){
 			this.myparent = parent;
@@ -400,6 +631,8 @@ public class BTree {
 		public BTreeNode[] getChildren(){
 			return children;
 		}
+
+
 
 		//		public BTreeNode readFile() {
 		//			String mode = "r";			//rw is read write
@@ -425,37 +658,45 @@ public class BTree {
 			//File outputFile = new File(theFilename);
 			String mode = "rwd";			//rw is read write
 			try{ 
-				Cache.addObject(this);
-				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
-				// General B Tree Info
-				fileWriter.seek(0);
-				//System.out.println("rear: "+rear);
-				fileWriter.writeLong(getRoot().getFileOffset());	//root file offset
-				fileWriter.writeInt(sequenceLength);	//sequenceLength
-				fileWriter.writeInt(t);			//degree
-				fileWriter.writeInt(numNodes);	// the total number of nodes, TN: I dont think its necessary to print this
+				BTreeNode writeNode = null;
+				if(cache == 1){
+					writeNode = theCache.addObject(this);
+					System.out.println("----------");
+					System.out.println(writeNode);
+					System.out.println("----------");
+				}
+				if (writeNode != null || cache == 0){
+					RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
+					// General B Tree Info
+					fileWriter.seek(0);
+					//System.out.println("rear: "+rear);
+					fileWriter.writeLong(getRoot().getFileOffset());	//root file offset
+					fileWriter.writeInt(sequenceLength);	//sequenceLength
+					fileWriter.writeInt(t);			//degree
+					fileWriter.writeInt(numNodes);	// the total number of nodes, TN: I dont think its necessary to print this
 
-				// Individual Node Info:
-				fileWriter.seek(fileOffset);
-				fileWriter.writeInt(rear);	//number of keys in node
-				for(int i = 0; i < (2*t-1); i += 1) {
-					if (i < rear) {
-						fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
-						fileWriter.writeInt(keys[i].frequency);
-					} else {
-						fileWriter.writeLong(0);
-						fileWriter.writeInt(0);
+					// Individual Node Info:
+					fileWriter.seek(fileOffset);
+					fileWriter.writeInt(rear);	//number of keys in node
+					for(int i = 0; i < (2*t-1); i += 1) {
+						if (i < rear) {
+							fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
+							fileWriter.writeInt(keys[i].frequency);
+						} else {
+							fileWriter.writeLong(0);
+							fileWriter.writeInt(0);
+						}
 					}
-				}
-				for(int i = 0; i < 2*t; i += 1) {
-					if(i<childRear) {
-						System.out.println(children[i].getFileOffset());
-						fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
-					} else {
-						fileWriter.writeLong(0);
+					for(int i = 0; i < 2*t; i += 1) {
+						if(i<childRear) {
+							System.out.println(children[i].getFileOffset());
+							fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
+						} else {
+							fileWriter.writeLong(0);
+						}
 					}
+					fileWriter.close();
 				}
-				fileWriter.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -488,9 +729,9 @@ public class BTree {
 			return ss;
 		}
 	}
-	
-///=================================================================	
-	
+
+	///=================================================================	
+
 	public class BTreeObject{
 		private int frequency;
 		private long key;
@@ -503,20 +744,20 @@ public class BTree {
 		public void incrementFreq(){
 			frequency++;
 		}
-		
+
 		public long getKey() {
 			return key;
 		}
-		
+
 		public int getFrequency() {
 			return frequency;
 		}
 	}
-	
 
-	
-	
-	
-	
-	
+
+
+
+
+
+
 }	

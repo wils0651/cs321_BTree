@@ -36,7 +36,7 @@ public class TylerTest {
 			writer1.println(tylerTree.getDegree());	//degree of tree;
 			writer1.println(tylerTree.getSequenceLength());	//
 			writer1.println(tylerTree.getRoot().getFileOffset());	//offset of the rootnode
-			writer1.println(tylerTree.numNodes());	//numberOfNodes
+			writer1.println(tylerTree.numNodes());	//numberOfNodes 
 
 			writer1.close();
 		} catch (IOException e) {
@@ -46,8 +46,9 @@ public class TylerTest {
 	}
 
 	public static void main(String[] args) throws InterruptedException, IOException {
-		degree = 3;
-		sequenceLength = 7;
+		degree = 4;
+		sequenceLength = 3; 
+
 		
 		int cache = 1;
 

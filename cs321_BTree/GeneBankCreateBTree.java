@@ -48,14 +48,15 @@ public class GeneBankCreateBTree {
 		}
 
 		int thisCache = Integer.parseInt(args[0]);
-		if(thisCache == 1 || thisCache == 0){
+		if(thisCache == 1 || thisCache == 0){ 
 
 		}
 		else{
 			throw new IllegalArgumentException("Improper Cache Specification");
 		}
+		
+		
 		int thisDegree = Integer.parseInt(args[1]);
-
 
 		if(thisDegree < 0) {
 			throw new IllegalArgumentException("Improper Degree Selection");
@@ -97,12 +98,12 @@ public class GeneBankCreateBTree {
 
 
 		int debugMode = 0;
-		if ((args.length == 5 && Integer.parseInt(args[0]) == 0) || args.length == 6) {
-			debugMode = Integer.parseInt(args[4]);
-			if(!(debugMode == 0 || debugMode == 1)) {
-				throw new IllegalArgumentException("Improper Debug Mode Selection");
-			}
-		}
+//		if ((args.length == 4 && Integer.parseInt(args[0]) == 0) || args.length == 5) {
+//			debugMode = Integer.parseInt(args[4]);
+//			if(!(debugMode == 0 || debugMode == 1)) {
+//				throw new IllegalArgumentException("Improper Debug Mode Selection");
+//			}
+//		}
 
 
 		//Create an object, pass int the degree, output filename,and sequence length
@@ -110,12 +111,15 @@ public class GeneBankCreateBTree {
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisCache, thisCacheSize, thisDegree, thisFilename, ThisSequenceLength);
 
 		gbcbt.sendToParser(); 
-
-		gbcbt.theBTree.writeCache();
-		gbcbt.writeMetadata();
-		gbcbt.debugDump();
-		gbcbt.theBTree.getCacheSize();
-		gbcbt.theBTree.traverseTree();
+		if(gbcbt.theBTree.numNodes() > 1){
+			gbcbt.theBTree.writeCache();
+			gbcbt.writeMetadata();
+			gbcbt.debugDump();
+			gbcbt.theBTree.getCacheSize();
+			gbcbt.theBTree.traverseTree();
+		} else {
+			System.out.println("Empty B Tree");
+		}
 	}
 
 
@@ -230,7 +234,6 @@ public class GeneBankCreateBTree {
 	 */
 	public void sendToParser() throws Exception {
 		File theFile = new File(filename);
-		//TODO: send file to parser
 		FileInputStream theFileStream;
 		try {
 			theFileStream = new FileInputStream(theFile);

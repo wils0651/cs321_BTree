@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -58,7 +59,7 @@ public class TylerTest {
 			System.out.println();
 			System.out.println("---------------------");
 			System.out.println();
-			for (int i=0; i< 3000; i++){
+			for (int i=0; i< 300; i++){
 				tylerTree.insert(i);
 				tylerTree.traverseTree();
 			}
@@ -79,6 +80,10 @@ public class TylerTest {
 			writeMetadata(tylerTree);
 			System.out.println(tylerTree.getRoot().getFileOffset());
 
+			LinkedList<Long> testList = tylerTree.inorderTraverseTree();
+			for(Long l: testList){
+				System.out.println(l);
+			}
 			//			
 			//			while(true) {
 			//				System.out.println("Enter a number to add to your tree, Tyler");

@@ -135,33 +135,26 @@ public class BTree {
 
 
 
-	public String inorderTraverseTree() throws InterruptedException {
-		Stack<BTreeNode> stack = new Stack<BTreeNode>();
-		String inOrderList = "";
-		System.out.println("\n===========================\n");
-		stack.push(myRoot);
-		return inorderTraverseTreeRecursive(stack, inOrderList);
+	public LinkedList<Long> inorderTraverseTree() throws InterruptedException {
+		LinkedList<Long> list = new LinkedList<Long>();
+		return inorderTraverseTreeRecursive(list, myRoot);
 	}
 
-	public String inorderTraverseTreeRecursive(Stack<BTreeNode> stack, String inOrderList) throws InterruptedException {
-		if (stack.isEmpty()){
-			return inOrderList;
+	public LinkedList<Long> inorderTraverseTreeRecursive(LinkedList<Long> list, BTreeNode node) throws InterruptedException {
+		if (node.numChildren() == 0){
+			for(int i = 0; i < node.getRear(); i++){
+			list.add(node.getKeys()[i].getKey());
+			}
+			return list;
 		}
-		BTreeNode node = stack.pop();
-
-		BTreeObject[] theKeys = node.getKeys();
-		for(int i = 0; i < node.rear; i += 1) {
-			inOrderList += theKeys[i].getKey();
-			inOrderList += " " + theKeys[i].getFrequency();
-			inOrderList += " " + ksConverter.keyToString(theKeys[i].getKey(), sequenceLength) +"\n";
+		
+		for (int i = 0; i <= node.getRear(); i++){
+			if (i>0){
+				list.add(node.getKeys()[i-1].getKey());
+			}
+			inorderTraverseTreeRecursive(list, node.getChildren()[i]);
 		}
-
-		for (int i = 0; i < node.numChildren(); i++){
-			System.out.println(node.getChildren()[i].getFileOffset());
-			stack.push(node.getChildren()[i]);
-		}
-
-		return inorderTraverseTreeRecursive(stack, inOrderList);
+		return list;
 	}
 
 	public void writeCache() throws IOException{

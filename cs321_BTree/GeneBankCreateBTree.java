@@ -112,11 +112,11 @@ public class GeneBankCreateBTree {
 
 		gbcbt.sendToParser(); 
 		if(gbcbt.theBTree.numNodes() > 1){
-			gbcbt.theBTree.writeCache();
 			gbcbt.writeMetadata();
+			gbcbt.theBTree.writeCache();
 			gbcbt.debugDump();
 			gbcbt.theBTree.getCacheSize();
-			gbcbt.theBTree.traverseTree();
+			//gbcbt.theBTree.traverseTree();
 		} else {
 			System.out.println("Empty B Tree");
 		}
@@ -319,7 +319,6 @@ public class GeneBankCreateBTree {
 
 		for(int i = 0; i < (maxCount-2); i++) {
 			long elLong = fileReader2.readLong();
-			System.out.print("elLong: "+elLong);
 			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
 		}
 		fileReader2.close();		//close the fileReader

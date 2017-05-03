@@ -47,7 +47,7 @@ public class TylerTest {
 
 	public static void main(String[] args) throws InterruptedException, IOException {
 		degree = 4;
-		sequenceLength = 3;
+		sequenceLength = 3; 
 
 
 		BTree tylerTree = new BTree(1, 100, degree, sequenceLength, "TyTest.txt");

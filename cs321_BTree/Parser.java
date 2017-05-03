@@ -39,17 +39,18 @@ public class Parser {
 		}
 		try{
 			while((g = (char)data.readByte()) != -1){
-				//g = (char)data.readByte();
+				
 
 				if(g != ' ' && g != '\n' && g != '\r' && g != '\t'){
 					characterList.add(g);
 				}
 
 				ss = characterList.getSubsequence();
-
+				System.out.println("current sequence: " + ss);
 				if(contains(ss, '/')) {
 					characterList.poll();
-					if(contains(ss, '/')) {
+					if(hasDoubleSlashes(ss)) {
+						characterList.clear();
 						skipHeader();
 					}
 				}
@@ -95,6 +96,18 @@ public class Parser {
 								}
 			}
 		}
+	}
+	public boolean hasDoubleSlashes(String s){
+		System.out.println("checking slashes");
+		for(int i = 0; i < s.length()-1; i++){
+			if(s.charAt(i) == '/'){
+				if(s.charAt(i+1) == '/'){
+					System.out.println("true");
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public boolean contains(String s, char find){

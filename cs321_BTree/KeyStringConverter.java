@@ -26,6 +26,7 @@ public class KeyStringConverter {
 			long base = mapBase(subsequence.substring(i-1, i));
 			theKey = theKey | (base<<2*(i-1));	//setbit
 		}
+		
 		return theKey;
 	}
 
@@ -69,7 +70,10 @@ public class KeyStringConverter {
 			String base = mapKey(theBits);
 			theSequence += base;
 		}
-		return theSequence;
+		StringBuilder sb = new StringBuilder();
+		sb.append(theSequence);
+		sb.reverse();
+		return sb.toString();
 	}
 
 

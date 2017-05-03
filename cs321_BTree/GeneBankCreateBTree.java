@@ -112,7 +112,7 @@ public class GeneBankCreateBTree {
 
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisCache, thisCacheSize, thisDegree, thisFilename, ThisSequenceLength);
 
-		gbcbt.sendToParser(); 
+		int numberOfOnes = gbcbt.sendToParser(); 
 		if(gbcbt.theBTree.numNodes() > 1){
 			gbcbt.writeMetadata();
 			if(thisCache == 1){
@@ -120,7 +120,7 @@ public class GeneBankCreateBTree {
 			gbcbt.theBTree.getCacheSize();
 			}
 			gbcbt.debugDump();
-			//gbcbt.theBTree.traverseTree();
+			System.out.println("parsed aaaaaac: " + numberOfOnes);
 		} else {
 			System.out.println("Empty B Tree");
 		}
@@ -169,15 +169,11 @@ public class GeneBankCreateBTree {
 //			writer1.println(gbkFileName);	//name of the BTree file
 			while (!dumpList.isEmpty()) {
 			  Long key = dumpList.remove();
-			  StringBuilder sb = new StringBuilder();
 			  String sequence = ksConverter.keyToString(key, sequenceLength);
-			  sb.append(sequence);
-			  sb.reverse();
 			  long freq = dumpList.remove();
-			  sb.append(": ");
-			  sb.append(freq);
-			  System.out.println(sb);
-			  writer1.println(sb);	
+			  String output = sequence + ": " + freq;
+			  System.out.println(output);
+			  writer1.println(output);	
 			}
 			writer1.close();
 		} catch (IOException e) {
@@ -240,7 +236,7 @@ public class GeneBankCreateBTree {
 	 * method to send the gene base file to the parser and B Tree
 	 * @throws Exception 
 	 */
-	public void sendToParser() throws Exception {
+	public int sendToParser() throws Exception {
 		File theFile = new File(filename);
 		FileInputStream theFileStream;
 		try {
@@ -249,10 +245,13 @@ public class GeneBankCreateBTree {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
+		int count = 0;
 		long nextKey;
 		while(gbkParser.hasMore() ) {
 			nextKey = gbkParser.getNextKey();
+			if(nextKey == 1){
+				count++;
+			}
 			if (nextKey != -1){
 			System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" encoded: "+Long.toBinaryString(nextKey));
 			theBTree.insert(nextKey);
@@ -260,6 +259,7 @@ public class GeneBankCreateBTree {
 		}
 		
 		System.out.println("numberOfNodes: " + theBTree.numNodes());
+		return count;
 	}
 
 

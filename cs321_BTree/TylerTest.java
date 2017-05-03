@@ -3,7 +3,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -46,7 +48,7 @@ public class TylerTest {
 		}
 	}
 
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws Exception {
 		degree = 4;
 		sequenceLength = 3; 
 
@@ -104,25 +106,45 @@ public class TylerTest {
 
 		}
 		else if (Integer.parseInt(args[0]) == 2){
-			RandomAccessFile file = new RandomAccessFile("TyTest.txt", "rw");
-
-			int rear = file.readInt();
-			System.out.println("rear: "+rear);
+			
+			int sequenceLength = 7;
+			FileInputStream stream = new FileInputStream("test3.gbk");
+			Parser aparse = new Parser(stream, sequenceLength);
+			KeyStringConverter ks = new KeyStringConverter();
+			HashMap<String, Integer> testMap = new HashMap<String,Integer>();
+			
 			int count = 0;
-			while(true){
-				if(count < rear) {
-					long key = file.readLong();
-					int frequency = file.readInt();
-
-					System.out.println(key);
-					System.out.println(frequency);
-					for(int i = 0; i < frequency; i++){
-						tylerTree.insert(key);
-					}
+			while(aparse.hasMore()){
+				System.out.println("number of sequences so far" +count);
+				StringBuilder sb = new StringBuilder();
+				sb.append(ks.keyToString(aparse.getNextKey(), sequenceLength));
+				sb.reverse();
+				System.out.println(sb.toString());
+				if(testMap.containsKey(sb.toString())){
+					testMap.put(sb.toString(), testMap.get(sb.toString())+1);
 				}
-				tylerTree.writeCache();
-				System.out.println();
-				tylerTree.traverseTree();
+				else{
+					testMap.put(sb.toString(), 1);
+				}
+				count++;
+			}
+			aparse.skipHeader();
+			while(aparse.hasMore()){
+				System.out.println("number of sequences so far" +count);
+				StringBuilder sb = new StringBuilder();
+				sb.append(ks.keyToString(aparse.getNextKey(), sequenceLength));
+				sb.reverse();
+				System.out.println(sb.toString());
+				if(testMap.containsKey(sb.toString())){
+					testMap.put(sb.toString(), testMap.get(sb.toString())+1);
+				}
+				else{
+					testMap.put(sb.toString(), 1);
+				}
+				count++;
+			}
+			for(Map.Entry<String, Integer> entry: testMap.entrySet()){
+				System.out.println(entry.getKey() + ": " + entry.getValue());
 			}
 		}
 	}

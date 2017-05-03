@@ -263,68 +263,68 @@ public class GeneBankCreateBTree {
 	}
 
 
-	/**
-	 * test method
-	 * @throws Exception 
-	 */
-	public void testWrite() throws Exception {
-		//TODO: delete this method
-
-		File theFile = new File(filename);
-		FileInputStream theFileStream;
-		try {
-			theFileStream = new FileInputStream(theFile);
-			gbkParser = new Parser(theFileStream, sequenceLength);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		int k = sequenceLength;
-		int t = degree;
-		String theFilename = filename+".btree.data." + k +"." +t;	
-		//String theFilename = "theTestFile.txt";
-		File outputFile = new File(theFilename);
-		String mode = "rw";			//read write
-		RandomAccessFile fileWriter;
-		fileWriter = new RandomAccessFile(outputFile, mode);
-
-		int maxCount = 20;
-		int countSeq = 0;
-
-		while(gbkParser.hasMore() && (countSeq < maxCount)) {
-			String testString = gbkParser.nextSubSequence();	
-			System.out.print(countSeq);
-			System.out.print(", testString: " + testString); 	//: remove
-			long testBases = ksConverter.stringToKey(testString, sequenceLength); 	//: remove
-			System.out.println(" in binary: "+Long.toBinaryString(testBases));
-
-			fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
-
-			countSeq++;
-		}
-
-		// to view file in console: xxd -b file
-		fileWriter.close();
-
-		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
-		System.out.println("Seek to 8");
-		fileReader.seek(8);
-
-		for(int i = 0; i < (maxCount-1); i++) {
-			long elLong = fileReader.readLong();
-			System.out.print("elLong: "+elLong);
-			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
-		}
-		fileReader.close();		//close the fileReader
-
-		RandomAccessFile fileReader2 = new RandomAccessFile(outputFile, "r");
-		System.out.println("Seek again");
-		fileReader2.seek(0);
-
-		for(int i = 0; i < (maxCount-2); i++) {
-			long elLong = fileReader2.readLong();
-			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
-		}
-		fileReader2.close();		//close the fileReader
-	}
+//	/**
+//	 * test method
+//	 * @throws Exception 
+//	 */
+//	public void testWrite() throws Exception {
+//		//TODO: delete this method
+//
+//		File theFile = new File(filename);
+//		FileInputStream theFileStream;
+//		try {
+//			theFileStream = new FileInputStream(theFile);
+//			gbkParser = new Parser(theFileStream, sequenceLength);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//
+//		int k = sequenceLength;
+//		int t = degree;
+//		String theFilename = filename+".btree.data." + k +"." +t;	
+//		//String theFilename = "theTestFile.txt";
+//		File outputFile = new File(theFilename);
+//		String mode = "rw";			//read write
+//		RandomAccessFile fileWriter;
+//		fileWriter = new RandomAccessFile(outputFile, mode);
+//
+//		int maxCount = 20;
+//		int countSeq = 0;
+//
+//		while(gbkParser.hasMore() && (countSeq < maxCount)) {
+//			String testString = gbkParser.nextSubSequence();	
+//			System.out.print(countSeq);
+//			System.out.print(", testString: " + testString); 	//: remove
+//			long testBases = ksConverter.stringToKey(testString, sequenceLength); 	//: remove
+//			System.out.println(" in binary: "+Long.toBinaryString(testBases));
+//
+//			fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
+//
+//			countSeq++;
+//		}
+//
+//		// to view file in console: xxd -b file
+//		fileWriter.close();
+//
+//		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
+//		System.out.println("Seek to 8");
+//		fileReader.seek(8);
+//
+//		for(int i = 0; i < (maxCount-1); i++) {
+//			long elLong = fileReader.readLong();
+//			System.out.print("elLong: "+elLong);
+//			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
+//		}
+//		fileReader.close();		//close the fileReader
+//
+//		RandomAccessFile fileReader2 = new RandomAccessFile(outputFile, "r");
+//		System.out.println("Seek again");
+//		fileReader2.seek(0);
+//
+//		for(int i = 0; i < (maxCount-2); i++) {
+//			long elLong = fileReader2.readLong();
+//			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
+//		}
+//		fileReader2.close();		//close the fileReader
+//	}
 }

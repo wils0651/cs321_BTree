@@ -29,6 +29,6 @@
 - [x] Search seems to have an error for some sequence lengths
 - [x] BTree: file offset for root is wrong
 - [x] BTree: error with file offsets for root's children
-- [ ] Cache: need to implement
-- [ ] debugDump - need to implement
+- [x] Cache: need to implement
+- [x] debugDump - need to implement
 - [x] test4.gbk error - this test file has no DNA sequences

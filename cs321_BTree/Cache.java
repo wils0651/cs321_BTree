@@ -59,6 +59,7 @@ public class Cache <BTreeNode>{
 
 	public BTree.BTreeNode removeFirst(){
 		if(data.size() > 0){
+			System.out.println("this node was removed from cache: " + data.removeFirst().toString());
 			return data.removeFirst();
 		}
 		return null;
@@ -72,7 +73,7 @@ public class Cache <BTreeNode>{
 	 * @param target
 	 */
 	public BTree.BTreeNode addObject(BTree.BTreeNode target){
-		if(data.contains(target)){
+		if(contains(target)){
 			data.remove(target);
 		}
 		data.addFirst(target);
@@ -81,6 +82,15 @@ public class Cache <BTreeNode>{
 			return data.removeLast();
 		}
 		return null;
+	}
+	
+	public boolean contains(BTree.BTreeNode node){
+		for(int i = 0; i < data.size(); i++){
+			if(node.getFileOffset() == data.get(i).getFileOffset()){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -133,6 +143,10 @@ public class Cache <BTreeNode>{
 	 */
 	public int size() {
 		return size;
+	}
+	
+	public int getSize(){
+		return data.size();
 	}
 
 	/**

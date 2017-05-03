@@ -37,6 +37,10 @@ public class BTree {
 		}
 	}
 
+	public int getCacheSize(){
+		return theCache.getSize();
+	}
+	
 	public int getSequenceLength() {
 		return sequenceLength;
 	}
@@ -135,7 +139,6 @@ public class BTree {
 	public String inorderTraverseTree() throws InterruptedException {
 		Stack<BTreeNode> stack = new Stack<BTreeNode>();
 		String inOrderList = "";
-		//Queue q = new Queue<BTreeNode>();
 		System.out.println("\n===========================\n");
 		stack.push(myRoot);
 		return inorderTraverseTreeRecursive(stack, inOrderList);
@@ -145,32 +148,27 @@ public class BTree {
 		if (stack.isEmpty()){
 			return inOrderList;
 		}
-		//		BTreeNode node = q.dequeue();
 		BTreeNode node = stack.pop();
 
-		//System.out.println(node.toString());
 		BTreeObject[] theKeys = node.getKeys();
 		for(int i = 0; i < node.rear; i += 1) {
 			inOrderList += theKeys[i].getKey();
 			inOrderList += " " + theKeys[i].getFrequency();
 			inOrderList += " " + ksConverter.keyToString(theKeys[i].getKey(), sequenceLength) +"\n";
 		}
-		//inOrderList.add(node.toString());
 
 		for (int i = 0; i < node.numChildren(); i++){
 			System.out.println(node.getChildren()[i].getFileOffset());
-			//			q.enqueue(node.getChildren()[i]);
 			stack.push(node.getChildren()[i]);
 		}
 
-		//		traverseTreeRecursive(q);
 		return inorderTraverseTreeRecursive(stack, inOrderList);
 	}
 
 	public void writeCache() throws IOException{
 		String mode = "rwd";			//rw is read write
 		try{ 
-			
+
 			RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
 			// General B Tree Info
 			fileWriter.seek(0);
@@ -179,8 +177,8 @@ public class BTree {
 			fileWriter.writeInt(sequenceLength);	//sequenceLength
 			fileWriter.writeInt(t);			//degree
 			fileWriter.writeInt(numNodes);	// the total number of nodes
-			
-			
+
+
 			BTreeNode writeNode = null;
 			while((writeNode = theCache.removeFirst()) != null)
 				if (writeNode != null){
@@ -241,7 +239,7 @@ public class BTree {
 
 			if(duplicate != null){
 				duplicate.incrementFreq();
-				this.writeNode();
+				writeNode();
 				return;
 			}
 
@@ -274,8 +272,7 @@ public class BTree {
 				}
 
 				rightNode.setParent(myparent);
-				//System.out.println("this add?");	//TODO: remove?
-				System.out.println(myparent.childRear);
+
 				myparent.addChild(rightNode);
 
 				BTreeNode addNode = null;
@@ -421,7 +418,7 @@ public class BTree {
 		public int getRear(){
 			return rear;
 		}
-		
+
 		public int getChildRear(){
 			return childRear;
 		}
@@ -466,56 +463,60 @@ public class BTree {
 		 * writes to node
 		 * @throws IOException
 		 */
-		public void writeNode() throws IOException {
+		public void writeToFile(BTreeNode node) throws IOException{
 			// TODO design file format
 			//root file offset (long), sequence length (int), degree (int), number of nodes (int)
 			//String theFilename = "theTestFile.txt";
 			//File outputFile = new File(theFilename);
 			String mode = "rwd";			//rw is read write
-			try{ 
-				BTreeNode writeNode = null;
-				if(cache == 1){
-					writeNode = theCache.addObject(this);
-					System.out.println("----------");
-					System.out.println(writeNode);
-					System.out.println("----------");
-				}
-				if (writeNode != null || cache == 0){
-					RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
-					// General B Tree Info
-//					fileWriter.seek(0);
-//					//System.out.println("rear: "+rear);
-//					fileWriter.writeLong(getRoot().getFileOffset());	//root file offset
-//					fileWriter.writeInt(sequenceLength);	//sequenceLength
-//					fileWriter.writeInt(t);			//degree
-//					fileWriter.writeInt(numNodes);	// the total number of nodes, TN: I dont think its necessary to print this
+			try{
+				RandomAccessFile fileWriter = new RandomAccessFile(btreeFile, mode);
 
-					// Individual Node Info:
-					fileWriter.seek(fileOffset);
-					fileWriter.writeInt(rear);	//number of keys in node
-					for(int i = 0; i < (2*t-1); i += 1) {
-						if (i < rear) {
-							fileWriter.writeLong(keys[i].key);		//Writes a long to the file as eight bytes, high byte first.
-							fileWriter.writeInt(keys[i].frequency);
-						} else {
-							fileWriter.writeLong(0);
-							fileWriter.writeInt(0);
-						}
+				// Individual Node Info:
+				fileWriter.seek(node.getFileOffset());
+				fileWriter.writeInt(node.getRear());	//number of keys in node
+				for(int i = 0; i < (2*t-1); i += 1) {
+					if (i < node.getRear()) {
+						fileWriter.writeLong(node.getKeys()[i].key);		//Writes a long to the file as eight bytes, high byte first.
+						fileWriter.writeInt(node.getKeys()[i].frequency);
+					} else {
+						fileWriter.writeLong(0);
+						fileWriter.writeInt(0);
 					}
-					for(int i = 0; i < 2*t; i += 1) {
-						if(i<childRear) {
-							System.out.println(children[i].getFileOffset());
-							fileWriter.writeLong(children[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
-						} else {
-							fileWriter.writeLong(0);
-						}
-					}
-					fileWriter.close();
 				}
+				for(int i = 0; i < 2*t; i += 1) {
+					if(i<node.childRear) {
+						System.out.println(node.getChildren()[i].getFileOffset());
+						fileWriter.writeLong(node.getChildren()[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
+					} else {
+						fileWriter.writeLong(0);
+
+					}
+				}
+				fileWriter.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 
+			}
+
+		}
+
+		public void writeNode() throws IOException {
+			// TODO design file format
+			//root file offset (long), sequence length (int), degree (int), number of nodes (int)
+			//String theFilename = "theTestFile.txt";
+			//File outputFile = new File(theFilename);
+			BTreeNode writeNode = null;
+			if(cache == 1){
+				writeNode = theCache.addObject(this);
+			}
+			else{
+				writeNode = this;
+			}
+
+			if (writeNode != null || cache == 0){
+				writeToFile(writeNode);
 			}
 
 		}

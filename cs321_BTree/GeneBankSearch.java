@@ -11,7 +11,8 @@ public class GeneBankSearch {
 	//private String bTreeFilename;
 	private String queryFilename;
 	private int debugMode;
-
+	private static int thisCache;
+	private static int cacheSize;
 	private int degree;
 	private int sequenceLength;
 	private long fileOffsetRoot;//offset of the root node
@@ -62,10 +63,10 @@ public class GeneBankSearch {
 		}
 		
 		if(Integer.parseInt(args[0]) == 1){
-			//TODO: use cache
+			thisCache = Integer.parseInt(args[0]);
 		}
 		else{
-			//TODO: dont use cache
+			thisCache = 0;
 		}
 
 		// Check <btree file>
@@ -83,11 +84,25 @@ public class GeneBankSearch {
 			System.err.println("Query file not found.");
 			System.exit(1);
 		}
+		if (args.length == 4 && thisCache == 1){
+			cacheSize = Integer.parseInt(args[3]);
+		}
+		else if (args.length == 4 && thisCache == 0){
+			cacheSize = 0;
+		}
 
 		int thisDebugMode = 0;
-		if ((args.length > 3 && Integer.parseInt(args[0]) == 0) || args.length == 5) {
+		if (args.length == 5 && thisCache == 0) {
 			//TODO: change if another Debug level is added
-			thisDebugMode = Integer.parseInt(args[2]);
+			cacheSize = 0;
+			thisDebugMode = Integer.parseInt(args[4]);
+			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {
+				throw new IllegalArgumentException("Improper Debug Mode Selection");
+			}
+		}
+		else if(args.length == 5 && thisCache == 1){
+			cacheSize = Integer.parseInt(args[3]);
+			thisDebugMode = Integer.parseInt(args[4]);
 			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {
 				throw new IllegalArgumentException("Improper Debug Mode Selection");
 			}
@@ -162,11 +177,11 @@ public class GeneBankSearch {
 			System.out.println("degree: " + degree);
 			System.out.println("numNodes: " + numNodes);
 			System.out.println("fileOffsetRoot: "+ fileOffsetRoot);
-
-			System.out.println("1540 appears " + searchKey(1540, fileOffsetRoot) + " times");
-			System.out.println("2949 appears " + searchKey(2949, fileOffsetRoot) + " times");
-			System.out.println("1 appears " + searchKey(1, fileOffsetRoot) + " times");
-			System.out.println("386 appears " + searchKey(382, fileOffsetRoot) + " times");
+//
+//			System.out.println("1540 appears " + searchKey(1540, fileOffsetRoot) + " times");
+//			System.out.println("2949 appears " + searchKey(2949, fileOffsetRoot) + " times");
+//			System.out.println("1 appears " + searchKey(1, fileOffsetRoot) + " times");
+//			System.out.println("386 appears " + searchKey(382, fileOffsetRoot) + " times");
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -310,6 +325,11 @@ public class GeneBankSearch {
 		Scanner fileScan = new Scanner(queryFile);
 		System.out.println("Query and Frequency");
 		int totalSequences = 0;
+		
+			String testString = "TTTTTTT";
+			Long testLong = ksConverter.stringToKey(testString, sequenceLength);
+			int testFreq = searchKey(testLong, fileOffsetRoot);
+			System.out.println(testString + ": " + testFreq);
 
 		while(fileScan.hasNext()) {
 			String queryString = fileScan.nextLine();
@@ -319,8 +339,8 @@ public class GeneBankSearch {
 			if(queryFreq != 0) {
 				totalSequences += queryFreq;
 			}
-		
 		}
+	
 		fileScan.close();
 		System.out.println("Total Sequences found: "+totalSequences);
 	}

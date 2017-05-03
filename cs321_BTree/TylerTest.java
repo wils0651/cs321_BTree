@@ -46,25 +46,34 @@ public class TylerTest {
 	}
 
 	public static void main(String[] args) throws InterruptedException, IOException {
-		degree = 4;
-		sequenceLength = 3;
+		degree = 3;
+		sequenceLength = 7;
+		
+		int cache = 1;
 
-
-		BTree tylerTree = new BTree(1, 100, degree, sequenceLength, "TyTest.txt");
+		BTree tylerTree = new BTree(cache, 1000, degree, sequenceLength, "TyTest.txt");
 		if(Integer.parseInt(args[0]) == 1){
 			Scanner scan = new Scanner(System.in);		
 			System.out.println();
 			System.out.println("---------------------");
 			System.out.println();
-			for (int i=0; i< 30; i++){
+			for (int i=0; i< 10000; i++){
+				tylerTree.insert(i);
+				tylerTree.traverseTree();
+			}
+			for (int i=0; i< 100; i++){
 				tylerTree.insert(i);
 				tylerTree.traverseTree();
 			}
 
-			tylerTree.insert(29);
+			tylerTree.insert(256);
 
 			tylerTree.insert(29);
-			tylerTree.writeCache();
+			
+			if(cache == 1){
+				tylerTree.writeCache();
+			}
+			System.out.println("done with cache?");
 			writeMetadata(tylerTree);
 			System.out.println(tylerTree.getRoot().getFileOffset());
 
@@ -128,12 +137,11 @@ public class TylerTest {
 			System.out.println("numNodes: " + numNodes);
 			System.out.println("fileReadOffset "+ rootReadOffset);
 
-			for (int i=0; i< 30; i++){
+			for (int i=0; i< 10000; i+=3){
 				System.out.println("number of occurences of " + i +": " + searchKey(i, rootReadOffset));
 			}
-
-			System.out.println("number of occurences of " + 220 +": " + searchKey(220, rootReadOffset));
 			
+			System.out.println("number of occurences of " + 7925 +": " + searchKey(7925, rootReadOffset));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

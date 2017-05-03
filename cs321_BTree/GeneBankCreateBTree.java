@@ -83,15 +83,21 @@ public class GeneBankCreateBTree {
 
 		int thisCacheSize = 0;
 		if(thisCache == 1){
-			thisCacheSize = Integer.parseInt(args[4]);
-			if(thisCacheSize <= 0 ) {
-				throw new IllegalArgumentException("Improper Cache Size Specification");
+			try{
+				thisCacheSize = Integer.parseInt(args[4]);
+				if(thisCacheSize <= 0 ) {
+					throw new IllegalArgumentException("Improper Cache Size Specification");
+				}
+			}
+			catch(ArrayIndexOutOfBoundsException e){
+				System.out.println("Please enter a size for your cache");
+				System.exit(0);
 			}
 		}
 
 
 		int debugMode = 0;
-		if ((args.length == 4 && Integer.parseInt(args[0]) == 0) || args.length == 5) {
+		if ((args.length == 5 && Integer.parseInt(args[0]) == 0) || args.length == 6) {
 			debugMode = Integer.parseInt(args[4]);
 			if(!(debugMode == 0 || debugMode == 1)) {
 				throw new IllegalArgumentException("Improper Debug Mode Selection");
@@ -105,14 +111,11 @@ public class GeneBankCreateBTree {
 
 		gbcbt.sendToParser(); 
 
-		//gbcbt.testWrite();
+		gbcbt.theBTree.writeCache();
 		gbcbt.writeMetadata();
-		System.out.println(gbcbt.theBTree.myRoot.getFileOffset());
-		
 		gbcbt.debugDump();
-		
-
-
+		gbcbt.theBTree.getCacheSize();
+		gbcbt.theBTree.traverseTree();
 	}
 
 
@@ -243,9 +246,9 @@ public class GeneBankCreateBTree {
 			if (nextKey != -1){
 			System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" encoded: "+Long.toBinaryString(nextKey));
 			theBTree.insert(nextKey);
-			theBTree.traverseTree();
 			}
 		}
+		
 		System.out.println("numberOfNodes: " + theBTree.numNodes());
 	}
 

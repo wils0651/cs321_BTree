@@ -31,4 +31,4 @@
 - [x] BTree: error with file offsets for root's children
 - [ ] Cache: need to implement
 - [ ] debugDump - need to implement
-- [ ] test4.gbk error - this test file has no DNA sequences
+- [x] test4.gbk error - this test file has no DNA sequences

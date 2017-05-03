@@ -84,9 +84,15 @@ public class GeneBankCreateBTree {
 
 		int thisCacheSize = 0;
 		if(thisCache == 1){
-			thisCacheSize = Integer.parseInt(args[4]);
-			if(thisCacheSize <= 0 ) {
-				throw new IllegalArgumentException("Improper Cache Size Specification");
+			try{
+				thisCacheSize = Integer.parseInt(args[4]);
+				if(thisCacheSize <= 0 ) {
+					throw new IllegalArgumentException("Improper Cache Size Specification");
+				}
+			}
+			catch(ArrayIndexOutOfBoundsException e){
+				System.out.println("Please enter a size for your cache");
+				System.exit(0);
 			}
 		}
 
@@ -105,15 +111,15 @@ public class GeneBankCreateBTree {
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisCache, thisCacheSize, thisDegree, thisFilename, ThisSequenceLength);
 
 		gbcbt.sendToParser(); 
-
-		//gbcbt.testWrite();
-		gbcbt.writeMetadata();
-		System.out.println(gbcbt.theBTree.myRoot.getFileOffset());
-		
-		gbcbt.debugDump();
-		
-
-
+		if(gbcbt.theBTree.numNodes() > 1){
+			gbcbt.theBTree.writeCache();
+			gbcbt.writeMetadata();
+			gbcbt.debugDump();
+			gbcbt.theBTree.getCacheSize();
+			gbcbt.theBTree.traverseTree();
+		} else {
+			System.out.println("Empty B Tree");
+		}
 	}
 
 
@@ -228,7 +234,6 @@ public class GeneBankCreateBTree {
 	 */
 	public void sendToParser() throws Exception {
 		File theFile = new File(filename);
-		//TODO: send file to parser
 		FileInputStream theFileStream;
 		try {
 			theFileStream = new FileInputStream(theFile);
@@ -244,9 +249,9 @@ public class GeneBankCreateBTree {
 			if (nextKey != -1){
 			System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" encoded: "+Long.toBinaryString(nextKey));
 			theBTree.insert(nextKey);
-			theBTree.traverseTree();
 			}
 		}
+		
 		System.out.println("numberOfNodes: " + theBTree.numNodes());
 	}
 

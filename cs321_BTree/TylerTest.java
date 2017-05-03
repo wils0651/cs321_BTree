@@ -57,13 +57,13 @@ public class TylerTest {
 			System.out.println();
 			System.out.println("---------------------");
 			System.out.println();
-			for (int i=0; i< 10000; i++){
+			for (int i=0; i< 3000; i++){
 				tylerTree.insert(i);
 				tylerTree.traverseTree();
 			}
 			for (int i=0; i< 100; i++){
 				tylerTree.insert(i);
-				tylerTree.traverseTree();
+				//tylerTree.traverseTree();
 			}
 
 			tylerTree.insert(256);
@@ -72,6 +72,7 @@ public class TylerTest {
 			
 			if(cache == 1){
 				tylerTree.writeCache();
+				System.out.println(tylerTree.getCacheSize());
 			}
 			System.out.println("done with cache?");
 			writeMetadata(tylerTree);
@@ -137,11 +138,11 @@ public class TylerTest {
 			System.out.println("numNodes: " + numNodes);
 			System.out.println("fileReadOffset "+ rootReadOffset);
 
-			for (int i=0; i< 10000; i+=3){
+			for (int i=0; i< 400; i++){
 				System.out.println("number of occurences of " + i +": " + searchKey(i, rootReadOffset));
 			}
 			
-			System.out.println("number of occurences of " + 7925 +": " + searchKey(7925, rootReadOffset));
+			System.out.println("number of occurences of " + 3 +": " + searchKey(3, rootReadOffset));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

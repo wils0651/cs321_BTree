@@ -59,8 +59,7 @@ public class Cache <BTreeNode>{
 
 	public BTree.BTreeNode removeFirst(){
 		if(data.size() > 0){
-			System.out.println("this node was removed from cache: " + data.removeFirst().toString());
-			return data.removeFirst();
+			return data.remove(0);
 		}
 		return null;
 	}

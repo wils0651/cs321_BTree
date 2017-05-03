@@ -40,7 +40,7 @@ public class BTree {
 	public int getCacheSize(){
 		return theCache.getSize();
 	}
-	
+
 	public int getSequenceLength() {
 		return sequenceLength;
 	}
@@ -112,7 +112,6 @@ public class BTree {
 		System.out.println(node.toString());
 
 		for (int i = 0; i < node.numChildren(); i++){
-			System.out.println(node.getChildren()[i].getFileOffset());
 			q.enqueue(node.getChildren()[i]);
 		}
 
@@ -180,29 +179,33 @@ public class BTree {
 
 
 			BTreeNode writeNode = null;
-			while((writeNode = theCache.removeFirst()) != null)
-				if (writeNode != null){
-
-					// Individual Node Info:
-					fileWriter.seek(writeNode.getFileOffset());
-					fileWriter.writeInt(writeNode.getRear());	//number of keys in node
-					for(int i = 0; i < (2*t-1); i += 1) {
-						if (i < writeNode.getRear()) {
-							fileWriter.writeLong(writeNode.getKeys()[i].key);		//Writes a long to the file as eight bytes, high byte first.
-							fileWriter.writeInt(writeNode.getKeys()[i].frequency);
-						} else {
-							fileWriter.writeLong(0);
-							fileWriter.writeInt(0);
-						}
-					}
-					for(int i = 0; i < 2*t; i += 1) {
-						if(i<writeNode.getChildRear()) {
-							fileWriter.writeLong(writeNode.getChildren()[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
-						} else {
-							fileWriter.writeLong(0);
-						}
+			int j = 0;
+			writeNode = theCache.removeFirst();
+			while(writeNode != null){
+				System.out.println(theCache.getSize());
+				System.out.println(j + " elements removed");
+				// Individual Node Info:
+				fileWriter.seek(writeNode.getFileOffset());
+				fileWriter.writeInt(writeNode.getRear());	//number of keys in node
+				for(int i = 0; i < (2*t-1); i += 1) {
+					if (i < writeNode.getRear()) {
+						fileWriter.writeLong(writeNode.getKeys()[i].key);		//Writes a long to the file as eight bytes, high byte first.
+						fileWriter.writeInt(writeNode.getKeys()[i].frequency);
+					} else {
+						fileWriter.writeLong(0);
+						fileWriter.writeInt(0);
 					}
 				}
+				for(int i = 0; i < 2*t; i += 1) {
+					if(i<writeNode.getChildRear()) {
+						fileWriter.writeLong(writeNode.getChildren()[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
+					} else {
+						fileWriter.writeLong(0);
+					}
+				}
+				j++;
+				writeNode = theCache.removeFirst();
+			}
 			fileWriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

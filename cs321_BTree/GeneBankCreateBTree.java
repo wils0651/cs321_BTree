@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.util.LinkedList;
+import java.util.Scanner;
 
 public class GeneBankCreateBTree {
 	private int sequenceLength;	//Length of each DNA sequence stored in the BTree, k
@@ -113,9 +115,11 @@ public class GeneBankCreateBTree {
 		gbcbt.sendToParser(); 
 		if(gbcbt.theBTree.numNodes() > 1){
 			gbcbt.writeMetadata();
+			if(thisCache == 1){
 			gbcbt.theBTree.writeCache();
-			gbcbt.debugDump();
 			gbcbt.theBTree.getCacheSize();
+			}
+			gbcbt.debugDump();
 			//gbcbt.theBTree.traverseTree();
 		} else {
 			System.out.println("Empty B Tree");
@@ -156,28 +160,31 @@ public class GeneBankCreateBTree {
 		 * <frequency> <DNA string>. The dump file contains frequency and DNA string
 		 * (corresponding to the key stored) in an inorder traversal.
 		 */
-		//TODO: 
-		System.out.println(theBTree.inorderTraverseTree());
+		LinkedList<Long> dumpList = theBTree.inorderTraverseTree();
 		
-//		String fileName = "dump";
-//
-//		try{
-//			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
-//			//writer1.println(gbkFileName);	//name of the BTree file
-//			writer1.println("TODO");	//degree of tree;
-//			
-//			writer1.close();
-//		} catch (IOException e) {
-//			System.err.println("Error creating file: " + fileName);
-//			System.exit(1);
-//		}
+		String fileName = "dump";
+
+		try{
+			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
+//			writer1.println(gbkFileName);	//name of the BTree file
+			while (!dumpList.isEmpty()) {
+			  Long key = dumpList.remove();
+			  StringBuilder sb = new StringBuilder();
+			  String sequence = ksConverter.keyToString(key, sequenceLength);
+			  sb.append(sequence);
+			  sb.reverse();
+			  long freq = dumpList.remove();
+			  sb.append(": ");
+			  sb.append(freq);
+			  System.out.println(sb);
+			  writer1.println(sb);	
+			}
+			writer1.close();
+		} catch (IOException e) {
+			System.err.println("Error creating file: " + fileName);
+			System.exit(1);
+		}
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -186,6 +193,7 @@ public class GeneBankCreateBTree {
 	 * sets the default size of the B Trees
 	 */
 	private static int bTreeDefaultSize() {
+		//TODO: check this to see if it matches what we do
 		int sizeHeader = 4 + 4 + 4 + 8;	//bytes
 		int sizeObject = 8 + 4;	//bytes, (2t-1)
 		int sizeChild  = 8;		//bytes, (2t)
@@ -239,7 +247,6 @@ public class GeneBankCreateBTree {
 			theFileStream = new FileInputStream(theFile);
 			gbkParser = new Parser(theFileStream, sequenceLength);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -264,20 +271,17 @@ public class GeneBankCreateBTree {
 		//TODO: delete this method
 
 		File theFile = new File(filename);
-		//TODO: send file to parser
 		FileInputStream theFileStream;
 		try {
 			theFileStream = new FileInputStream(theFile);
 			gbkParser = new Parser(theFileStream, sequenceLength);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		//TODO: write to disk.
 		int k = sequenceLength;
 		int t = degree;
-		String theFilename = filename+".btree.data." + k +"." +t;	//TODO: uncomment this
+		String theFilename = filename+".btree.data." + k +"." +t;	
 		//String theFilename = "theTestFile.txt";
 		File outputFile = new File(theFilename);
 		String mode = "rw";			//read write
@@ -288,10 +292,10 @@ public class GeneBankCreateBTree {
 		int countSeq = 0;
 
 		while(gbkParser.hasMore() && (countSeq < maxCount)) {
-			String testString = gbkParser.nextSubSequence();	//TODO: remove
+			String testString = gbkParser.nextSubSequence();	
 			System.out.print(countSeq);
-			System.out.print(", testString: " + testString); 	//TODO: remove
-			long testBases = ksConverter.stringToKey(testString, sequenceLength); 	//TODO: remove
+			System.out.print(", testString: " + testString); 	//: remove
+			long testBases = ksConverter.stringToKey(testString, sequenceLength); 	//: remove
 			System.out.println(" in binary: "+Long.toBinaryString(testBases));
 
 			fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.

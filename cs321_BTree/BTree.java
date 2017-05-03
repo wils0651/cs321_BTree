@@ -3,9 +3,7 @@ import sun.misc.Queue;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Stack;
 
 
 public class BTree {
@@ -57,21 +55,35 @@ public class BTree {
 		//myRoot.setFileOffset(fileOffset);
 	}
 
+	/**
+	 * 
+	 * @return the degree of the B Tree
+	 */
 	public int getDegree(){
 		return t;
 	}
 
+	/**
+	 * 
+	 * @return return the root of the B Tree
+	 */
 	public BTreeNode getRoot(){
 		return myRoot;
 	}
 
-	public boolean find(long sskey){		//true if the tree contains the element, can also return frequency instead
+	/**
+	 * 
+	 * @param sskey
+	 * @return true if the tree contains the element
+	 */
+	public boolean find(long sskey){		//could return frequency instead
 		if(myRoot.contains(sskey) != null){
 			return true;
 		}
 		return false;
 	}
 
+	
 	public int search(BTreeNode root, long key){
 		BTreeObject found = root.contains(key);
 		if (found != null){
@@ -93,6 +105,10 @@ public class BTree {
 		return 0;
 	}
 
+	/**
+	 * 
+	 * @return number of nodes in the B Tree
+	 */
 	public int numNodes(){
 		return numNodes;
 	}
@@ -133,8 +149,6 @@ public class BTree {
 		return aNode;
 	}
 
-
-
 	public LinkedList<Long> inorderTraverseTree() throws InterruptedException {
 		LinkedList<Long> list = new LinkedList<Long>();
 		return inorderTraverseTreeRecursive(list, myRoot);
@@ -144,6 +158,7 @@ public class BTree {
 		if (node.numChildren() == 0){
 			for(int i = 0; i < node.getRear(); i++){
 			list.add(node.getKeys()[i].getKey());
+			list.add((long) node.getKeys()[i].getFrequency());
 			}
 			return list;
 		}
@@ -151,12 +166,15 @@ public class BTree {
 		for (int i = 0; i <= node.getRear(); i++){
 			if (i>0){
 				list.add(node.getKeys()[i-1].getKey());
+				list.add((long) node.getKeys()[i-1].getFrequency());
 			}
 			inorderTraverseTreeRecursive(list, node.getChildren()[i]);
 		}
 		return list;
 	}
 
+	
+	
 	public void writeCache() throws IOException{
 		String mode = "rwd";			//rw is read write
 		try{ 
@@ -173,7 +191,9 @@ public class BTree {
 
 			BTreeNode writeNode = null;
 			int j = 0;
+			if(cache == 1){
 			writeNode = theCache.removeFirst();
+			}
 			while(writeNode != null){
 				System.out.println(theCache.getSize());
 				System.out.println(j + " elements removed");
@@ -325,6 +345,10 @@ public class BTree {
 		}
 
 
+		/**
+		 * 
+		 * @return the number of children
+		 */
 		public int numChildren(){
 			return childRear;
 		}
@@ -449,7 +473,6 @@ public class BTree {
 		//				fileReader.seek(fileOffset);
 		//				fileReader.writeInt(rear);	// the number of keys in the long
 		//			} catch (IOException e) {
-		//				// TODO Auto-generated catch block
 		//				e.printStackTrace();
 		//
 		//			}
@@ -460,7 +483,6 @@ public class BTree {
 		 * @throws IOException
 		 */
 		public void writeToFile(BTreeNode node) throws IOException{
-			// TODO design file format
 			//root file offset (long), sequence length (int), degree (int), number of nodes (int)
 			//String theFilename = "theTestFile.txt";
 			//File outputFile = new File(theFilename);
@@ -491,7 +513,6 @@ public class BTree {
 				}
 				fileWriter.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 
 			}
@@ -499,7 +520,6 @@ public class BTree {
 		}
 
 		public void writeNode() throws IOException {
-			// TODO design file format
 			//root file offset (long), sequence length (int), degree (int), number of nodes (int)
 			//String theFilename = "theTestFile.txt";
 			//File outputFile = new File(theFilename);

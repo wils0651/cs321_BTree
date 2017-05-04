@@ -248,18 +248,29 @@ public class GeneBankCreateBTree {
 		}
 		int count = 0;
 		long nextKey;
+		
+		String fileName = "parserOutput.txt";
+		PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
+		
 		while(gbkParser.hasMore() ) {
 			nextKey = gbkParser.getNextKey();
 			if(nextKey == 1){
 				count++;
 			}
 			if (nextKey != -1){
-			System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" encoded: "+Long.toBinaryString(nextKey));
-			theBTree.insert(nextKey);
+				
+				String sequence = ksConverter.keyToString(nextKey, sequenceLength);
+				String output = sequence;
+				writer1.println(output);	
+				
+				System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" encoded: "+Long.toBinaryString(nextKey));
+				theBTree.insert(nextKey);
 			}
 		}
+		writer1.close();
 		return count;
 	}
+
 
 
 //	/**

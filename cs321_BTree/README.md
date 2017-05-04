@@ -1,12 +1,12 @@
 # B Tree Project
 
-### Authors
+Authors
 * Tyler Nicholls
 * Tim Wilson
 
-### Class: cs321 
-### Spring 2017
-### Due 5/4/2017
+Class: cs321 
+Spring 2017
+Due 5/4/2017
 
 ## Overview
 

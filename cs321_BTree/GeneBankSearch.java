@@ -114,7 +114,7 @@ public class GeneBankSearch {
 
 		gbs.readFile();
 		
-		gbs.traverseTree();
+		//gbs.traverseTree();
 		
 		gbs.searchQueries();
 		
@@ -158,7 +158,7 @@ public class GeneBankSearch {
 
 	
 	/**
-	 * 
+	 * Reads the metadata from the B Tree file
 	 * @throws InterruptedException
 	 */
 	public void readFile() throws InterruptedException {
@@ -184,7 +184,6 @@ public class GeneBankSearch {
 //			System.out.println("386 appears " + searchKey(382, fileOffsetRoot) + " times");
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -227,6 +226,7 @@ public class GeneBankSearch {
 		for(int i = 0; i <= (2*degree); i += 1) {
 			if(i <= numberOfKeys) {
 				childOffsets[i] = fileReader.readLong();
+				//TODO: this seems odd...
 				if(childOffsets[0] == 0){               //there are no children, so no key in the tree
 					return 0;
 				}
@@ -326,7 +326,7 @@ public class GeneBankSearch {
 		System.out.println("Query and Frequency");
 		int totalSequences = 0;
 		
-			String testString = "TTTTTTT";
+			String testString = "TATTTTT";
 			Long testLong = ksConverter.stringToKey(testString, sequenceLength);
 			int testFreq = searchKey(testLong, fileOffsetRoot);
 			System.out.println(testString + ": " + testFreq);

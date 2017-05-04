@@ -114,7 +114,7 @@ public class GeneBankCreateBTree {
 
 		int numberOfOnes = gbcbt.sendToParser(); 
 		if(gbcbt.theBTree.numNodes() > 1){
-			gbcbt.writeMetadata();
+			//gbcbt.writeMetadata();
 			if(thisCache == 1){
 			gbcbt.theBTree.writeCache();
 			gbcbt.theBTree.getCacheSize();
@@ -132,18 +132,21 @@ public class GeneBankCreateBTree {
 	private static void printUsage() {
 		System.out.println(
 				"Usage:\n"
-						+ " java GeneBankCreateBTree <degree> <gbk file> <sequence length> [<debug level>] \n"
-						+ " degree is the degree to be used for the BTree. If 0 is entered, the program will \n"
-						+ " choose the optimum degree based on a disk block size of 4096 bytes and the size \n"
-						+ " of the BTreeNode on disk \n"
-						+ " gbk file is the file of DNA sequences \n"
-						+ " sequence length is the length of DNA bases to be stored in each BTreeNode \n"
-						+ " debug level [optional]: \n"
-						+ " 0 Any diagnostic messages, help and status messages must be be printed on standard \n"
-						+ " error stream. \n"
-						+ " 1 The program writes a text file named dump, that has the following line format: \n"
-						+ " <frequency> <DNA string>. The dump file contains frequency and DNA string \n"
-						+ "(corresponding to the key stored) in an inorder traversal. \n"
+						+ " java GeneBankCreateBTree <0/1(no/with Cache)> <degree> <gbk file> <sequence length> \n"
+						+ " <cache size> [<debug level>] \n"
+						+ " <cache> will speed up the creation of the B Tree be reducing the number of saves"
+						+ " <degree> is the degree to be used for the BTree. If 0 is entered, the program will \n"
+						+ " 	choose the optimum degree based on a disk block size of 4096 bytes and the size \n"
+						+ " 	of the BTreeNode on disk \n"
+						+ " <gbk file> is the file of DNA sequences \n"
+						+ " <sequence length> is the length of DNA bases to be stored in each BTreeNode \n"
+						+ " <cache size>"
+						+ " <debug level> [optional]: \n"
+						+ " 	0 Any diagnostic messages, help and status messages must be be printed on standard \n"
+						+ " 	error stream. \n"
+						+ " 	1 The program writes a text file named dump, that has the following line format: \n"
+						+ " 	<frequency> <DNA string>. The dump file contains frequency and DNA string \n"
+						+ "		(corresponding to the key stored) in an inorder traversal. \n"
 				);
 		System.exit(1);
 	}
@@ -191,43 +194,43 @@ public class GeneBankCreateBTree {
 		int sizeHeader = 4 + 4 + 4 + 8;	//bytes
 		int sizeObject = 8 + 4;	//bytes, (2t-1)
 		int sizeChild  = 8;		//bytes, (2t)
-		int sizeParent = 4;		//bytes
+		//int sizeParent = 4;		//bytes
 		int sizeBlock  = 4096;	//bytes, size of block on disk
 		//int numObjects = (sizeBlock - sizeParent + sizeObject - sizeHeader)/(2*sizeChild + 2*sizeObject);
 		int numObjects = (sizeBlock + sizeObject - sizeHeader)/(2*sizeChild + 2*sizeObject);
 		return numObjects;
 	}
 
-	//TODO: move to BTree.java
-	/**
-	 * write relevant information to a metadata file
-	 */
-	private void writeMetadata() {
-		/* Metadata storage. We need to store some metadata about the BTree on disk. For
-		 * example, we can store 
-		 * 	the degree of the tree, 
-		 * 	sequence length
-		 * 	the byte offset of the root node (so we can find it), 
-		 * 	the number of nodes etc. 
-		 * This information could be stored in separate metadata file or it can be 
-		 * stored at the beginning of the BTree file.
-		 */
-		String fileName = "BTreeMetadata.txt";
-
-		try{
-			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
-			//writer1.println(gbkFileName);	//name of the BTree file
-			writer1.println(degree);	//degree of tree;
-			writer1.println(sequenceLength);	//
-			writer1.println(theBTree.getRoot().getFileOffset());	//offset of the rootnode
-			writer1.println(theBTree.numNodes());	//numberOfNodes
-
-			writer1.close();
-		} catch (IOException e) {
-			System.err.println("Error creating file: " + fileName);
-			System.exit(1);
-		}
-	}
+//	//TODO: move to BTree.java
+//	/**
+//	 * write relevant information to a metadata file
+//	 */
+//	private void writeMetadata() {
+//		/* Metadata storage. We need to store some metadata about the BTree on disk. For
+//		 * example, we can store 
+//		 * 	the degree of the tree, 
+//		 * 	sequence length
+//		 * 	the byte offset of the root node (so we can find it), 
+//		 * 	the number of nodes etc. 
+//		 * This information could be stored in separate metadata file or it can be 
+//		 * stored at the beginning of the BTree file.
+//		 */
+//		String fileName = "BTreeMetadata.txt";
+//
+//		try{
+//			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
+//			//writer1.println(gbkFileName);	//name of the BTree file
+//			writer1.println(degree);	//degree of tree;
+//			writer1.println(sequenceLength);	//
+//			writer1.println(theBTree.getRoot().getFileOffset());	//offset of the rootnode
+//			writer1.println(theBTree.numNodes());	//numberOfNodes
+//
+//			writer1.close();
+//		} catch (IOException e) {
+//			System.err.println("Error creating file: " + fileName);
+//			System.exit(1);
+//		}
+//	}
 
 
 	/**

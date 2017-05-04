@@ -11,6 +11,7 @@ public class GeneBankCreateBTree {
 	private String filename;
 	private BTree theBTree;
 	private KeyStringConverter ksConverter;
+	private int debugMode;
 
 	/*
 	 * Usage:
@@ -27,10 +28,11 @@ public class GeneBankCreateBTree {
 	 * <frequency> <DNA string>. The dump file contains frequency and DNA string
 	 * (corresponding to the key stored) in an inorder traversal.
 	 */
-	public GeneBankCreateBTree(int cache, int cacheSize, int degree, String filename, int sequenceLength) throws IOException{
+	public GeneBankCreateBTree(int cache, int cacheSize, int degree, String filename, int sequenceLength, int debugMode) throws IOException{
 		this.degree = degree;
 		this.filename = filename;
 		this.sequenceLength = sequenceLength;
+		this.debugMode = debugMode;
 
 		//int k = sequenceLength;
 		//int t = degree;
@@ -95,30 +97,37 @@ public class GeneBankCreateBTree {
 		}
 
 
-		int debugMode = 0;
-//		if ((args.length == 4 && Integer.parseInt(args[0]) == 0) || args.length == 5) {
-//			debugMode = Integer.parseInt(args[4]);
-//			if(!(debugMode == 0 || debugMode == 1)) {
-//				throw new IllegalArgumentException("Improper Debug Mode Selection");
-//			}
-//		}
+		int thisDebugMode = 0;
+		if ((args.length == 5 && Integer.parseInt(args[0]) == 0) || args.length == 6) {
+			thisDebugMode = Integer.parseInt(args[5]);
+			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {
+				printUsage();
+				throw new IllegalArgumentException("Improper Debug Mode Selection");
+			}
+		}
 
 
 		//Create an object, pass int the degree, output filename,and sequence length
 
-		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisCache, thisCacheSize, thisDegree, thisFilename, ThisSequenceLength);
+		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisCache, thisCacheSize, thisDegree, thisFilename, ThisSequenceLength, thisDebugMode);
 
+		System.out.println("processing file...");
 		gbcbt.sendToParser(); 
 //		gbcbt.writeMetadata();
 		if(gbcbt.theBTree.myRoot != null){
 			if(thisCache == 1){
-			gbcbt.theBTree.writeCache();
-			gbcbt.theBTree.getCacheSize();
+				if(thisDebugMode == 1) {System.out.println("writing cache...");}
+				gbcbt.theBTree.writeCache();
+				gbcbt.theBTree.getCacheSize();
 			}
-			gbcbt.debugDump();
+			if(thisDebugMode == 1) {
+				System.out.println("writing dump file...");
+				gbcbt.debugDump();
+				}
 		} else {
 			System.out.println("Empty B Tree");
 		}
+		System.out.println("Processing Finished.");
 	}
 
 
@@ -207,13 +216,13 @@ public class GeneBankCreateBTree {
         GeneBankParser geneBankParser = new GeneBankParser();
         
         String fileContents = new String(Files.readAllBytes(Paths.get(filename)));
-        System.out.println(fileContents);
+        if(debugMode == 1) {System.out.println("fileContents: "+fileContents);} 
 
         for(String sequence : geneBankParser.parseSequencesFromFileContents(fileContents)){
             for(String subSequence : geneBankParser.generateSubSequencesFromSequence(sequence, sequenceLength)){
                 Long value = geneBankParser.convertSequenceToLong(subSequence);
                 theBTree.insert(value);
-                System.out.println(value);
+                if(debugMode == 1) {System.out.println("value: "+value);}
             }
         }
         
@@ -222,7 +231,7 @@ public class GeneBankCreateBTree {
         while (keys.size() > 0) {
             long key = keys.remove(0);
             long frequency = keys.remove(0);
-            System.out.printf("%s: %s\n", geneBankParser.convertLongToSequence(key, sequenceLength), frequency);
+            if(debugMode == 1) {System.out.printf("%s: %s\n", geneBankParser.convertLongToSequence(key, sequenceLength), frequency);}
         }
 	}
 }

@@ -12,3 +12,14 @@
 /Cache.class
 /Test.class
 /BTree$Cache.class
+/BTreeFileAccess.class
+/BTreeMetaData.class
+/BTreeObject.class
+/GeneBankParser.class
+/GeneBankCreateBTree.java
+/BTreeMetadata.txt
+/BTreeMetadata2.txt
+/parserOutput.txt
+/test1.gbk.btree.data.4.4
+/test3q7short.gbk
+/dump

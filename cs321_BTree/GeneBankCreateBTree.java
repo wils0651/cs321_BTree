@@ -120,7 +120,6 @@ public class GeneBankCreateBTree {
 			gbcbt.theBTree.getCacheSize();
 			}
 			gbcbt.debugDump();
-			System.out.println("parsed aaaaaac: " + numberOfOnes);
 		} else {
 			System.out.println("Empty B Tree");
 		}
@@ -172,7 +171,6 @@ public class GeneBankCreateBTree {
 			  String sequence = ksConverter.keyToString(key, sequenceLength);
 			  long freq = dumpList.remove();
 			  String output = sequence + ": " + freq;
-			  System.out.println(output);
 			  writer1.println(output);	
 			}
 			writer1.close();
@@ -257,8 +255,6 @@ public class GeneBankCreateBTree {
 			theBTree.insert(nextKey);
 			}
 		}
-		
-		System.out.println("numberOfNodes: " + theBTree.numNodes());
 		return count;
 	}
 

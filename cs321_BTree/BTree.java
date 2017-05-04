@@ -195,8 +195,6 @@ public class BTree {
 			writeNode = theCache.removeFirst();
 			}
 			while(writeNode != null){
-				System.out.println(theCache.getSize());
-				System.out.println(j + " elements removed");
 				// Individual Node Info:
 				fileWriter.seek(writeNode.getFileOffset());
 				fileWriter.writeInt(writeNode.getRear());	//number of keys in node
@@ -504,7 +502,6 @@ public class BTree {
 				}
 				for(int i = 0; i < 2*t; i += 1) {
 					if(i<node.childRear) {
-						System.out.println(node.getChildren()[i].getFileOffset());
 						fileWriter.writeLong(node.getChildren()[i].getFileOffset());		//Writes a long to the file as eight bytes, high byte first.
 					} else {
 						fileWriter.writeLong(0);

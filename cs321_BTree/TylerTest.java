@@ -128,21 +128,7 @@ public class TylerTest {
 				}
 				count++;
 			}
-			aparse.skipHeader();
-			while(aparse.hasMore()){
-				System.out.println("number of sequences so far" +count);
-				StringBuilder sb = new StringBuilder();
-				sb.append(ks.keyToString(aparse.getNextKey(), sequenceLength));
-				sb.reverse();
-				System.out.println(sb.toString());
-				if(testMap.containsKey(sb.toString())){
-					testMap.put(sb.toString(), testMap.get(sb.toString())+1);
-				}
-				else{
-					testMap.put(sb.toString(), 1);
-				}
-				count++;
-			}
+
 			for(Map.Entry<String, Integer> entry: testMap.entrySet()){
 				System.out.println(entry.getKey() + ": " + entry.getValue());
 			}

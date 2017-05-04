@@ -41,12 +41,12 @@ public class Parser {
 			while((g = (char)data.readByte()) != -1){
 				
 
-				if(g != ' ' && g != '\n' && g != '\r' && g != '\t'){
+				if(g != ' ' && g != '\n' && g != '\r' && g != '\t' && !Character.isDigit(g)){
 					characterList.add(g);
 				}
 
 				ss = characterList.getSubsequence();
-				System.out.println("current sequence: " + ss);
+				System.out.println("string is " + ss);
 				if(contains(ss, '/')) {
 					characterList.poll();
 					if(hasDoubleSlashes(ss)) {
@@ -55,7 +55,7 @@ public class Parser {
 					}
 				}
 
-				else if(contains(ss,'N') || contains(ss,'n') || containsDigit(ss)){
+				else if(contains(ss,'N') || contains(ss,'n')){
 					for (int i = 0; i < ss.length(); i++){
 						characterList.poll();
 					}
@@ -75,7 +75,7 @@ public class Parser {
 
 	public void printList(){
 		for (Character c: characterList){
-			System.out.println(c);
+			System.out.println("character is: " + c);
 		}
 	}
 
@@ -98,11 +98,9 @@ public class Parser {
 		}
 	}
 	public boolean hasDoubleSlashes(String s){
-		System.out.println("checking slashes");
 		for(int i = 0; i < s.length()-1; i++){
 			if(s.charAt(i) == '/'){
 				if(s.charAt(i+1) == '/'){
-					System.out.println("true");
 					return true;
 				}
 			}

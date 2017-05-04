@@ -1,16 +1,13 @@
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 public class GeneBankCreateBTree {
 	private int sequenceLength;	//Length of each DNA sequence stored in the BTree, k
 	private int degree;	//Number of DNA sequences stored per BTreeNode, t
-	private Parser gbkParser; //parser
 	private String filename;
 	private BTree theBTree;
 	private KeyStringConverter ksConverter;
@@ -38,7 +35,6 @@ public class GeneBankCreateBTree {
 		//int k = sequenceLength;
 		//int t = degree;
 		String theFilename = filename+".btree.data." + sequenceLength +"." +degree;	//output filename?
-
 		theBTree = new BTree(cache, cacheSize, degree, sequenceLength, theFilename);
 		ksConverter = new KeyStringConverter();
 	}
@@ -112,9 +108,9 @@ public class GeneBankCreateBTree {
 
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisCache, thisCacheSize, thisDegree, thisFilename, ThisSequenceLength);
 
-		int numberOfOnes = gbcbt.sendToParser(); 
-		if(gbcbt.theBTree.numNodes() > 1){
-			//gbcbt.writeMetadata();
+		gbcbt.sendToParser(); 
+//		gbcbt.writeMetadata();
+		if(gbcbt.theBTree.myRoot != null){
 			if(thisCache == 1){
 			gbcbt.theBTree.writeCache();
 			gbcbt.theBTree.getCacheSize();
@@ -169,6 +165,8 @@ public class GeneBankCreateBTree {
 		try{
 			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
 //			writer1.println(gbkFileName);	//name of the BTree file
+			
+			
 			while (!dumpList.isEmpty()) {
 			  Long key = dumpList.remove();
 			  String sequence = ksConverter.keyToString(key, sequenceLength);
@@ -201,140 +199,31 @@ public class GeneBankCreateBTree {
 		return numObjects;
 	}
 
-//	//TODO: move to BTree.java
-//	/**
-//	 * write relevant information to a metadata file
-//	 */
-//	private void writeMetadata() {
-//		/* Metadata storage. We need to store some metadata about the BTree on disk. For
-//		 * example, we can store 
-//		 * 	the degree of the tree, 
-//		 * 	sequence length
-//		 * 	the byte offset of the root node (so we can find it), 
-//		 * 	the number of nodes etc. 
-//		 * This information could be stored in separate metadata file or it can be 
-//		 * stored at the beginning of the BTree file.
-//		 */
-//		String fileName = "BTreeMetadata.txt";
-//
-//		try{
-//			PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
-//			//writer1.println(gbkFileName);	//name of the BTree file
-//			writer1.println(degree);	//degree of tree;
-//			writer1.println(sequenceLength);	//
-//			writer1.println(theBTree.getRoot().getFileOffset());	//offset of the rootnode
-//			writer1.println(theBTree.numNodes());	//numberOfNodes
-//
-//			writer1.close();
-//		} catch (IOException e) {
-//			System.err.println("Error creating file: " + fileName);
-//			System.exit(1);
-//		}
-//	}
-
-
 	/**
 	 * method to send the gene base file to the parser and B Tree
 	 * @throws Exception 
 	 */
-	public int sendToParser() throws Exception {
-		File theFile = new File(filename);
-		FileInputStream theFileStream;
-		try {
-			theFileStream = new FileInputStream(theFile);
-			gbkParser = new Parser(theFileStream, sequenceLength);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		int count = 0;
-		long nextKey;
-		
-		String fileName = "parserOutput.txt";
-		PrintWriter writer1 = new PrintWriter(fileName, "UTF-8");
-		
-		while(gbkParser.hasMore() ) {
-			nextKey = gbkParser.getNextKey();
-			if(nextKey == 1){
-				count++;
-			}
-			if (nextKey != -1){
-				
-				String sequence = ksConverter.keyToString(nextKey, sequenceLength);
-				String output = sequence;
-				writer1.println(output);	
-				
-				System.out.println(ksConverter.keyToString(nextKey, sequenceLength)+" encoded: "+Long.toBinaryString(nextKey));
-				theBTree.insert(nextKey);
-			}
-		}
-		writer1.close();
-		return count;
+	public void sendToParser() throws Exception {
+        GeneBankParser geneBankParser = new GeneBankParser();
+        
+        String fileContents = new String(Files.readAllBytes(Paths.get(filename)));
+        System.out.println(fileContents);
+
+        for(String sequence : geneBankParser.parseSequencesFromFileContents(fileContents)){
+            for(String subSequence : geneBankParser.generateSubSequencesFromSequence(sequence, sequenceLength)){
+                Long value = geneBankParser.convertSequenceToLong(subSequence);
+                theBTree.insert(value);
+                System.out.println(value);
+            }
+        }
+        
+        LinkedList<Long> keys = theBTree.inorderTraverseTree();
+
+        while (keys.size() > 0) {
+            long key = keys.remove(0);
+            long frequency = keys.remove(0);
+            System.out.printf("%s: %s\n", geneBankParser.convertLongToSequence(key, sequenceLength), frequency);
+        }
 	}
-
-
-
-//	/**
-//	 * test method
-//	 * @throws Exception 
-//	 */
-//	public void testWrite() throws Exception {
-//		//TODO: delete this method
-//
-//		File theFile = new File(filename);
-//		FileInputStream theFileStream;
-//		try {
-//			theFileStream = new FileInputStream(theFile);
-//			gbkParser = new Parser(theFileStream, sequenceLength);
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//
-//		int k = sequenceLength;
-//		int t = degree;
-//		String theFilename = filename+".btree.data." + k +"." +t;	
-//		//String theFilename = "theTestFile.txt";
-//		File outputFile = new File(theFilename);
-//		String mode = "rw";			//read write
-//		RandomAccessFile fileWriter;
-//		fileWriter = new RandomAccessFile(outputFile, mode);
-//
-//		int maxCount = 20;
-//		int countSeq = 0;
-//
-//		while(gbkParser.hasMore() && (countSeq < maxCount)) {
-//			String testString = gbkParser.nextSubSequence();	
-//			System.out.print(countSeq);
-//			System.out.print(", testString: " + testString); 	//: remove
-//			long testBases = ksConverter.stringToKey(testString, sequenceLength); 	//: remove
-//			System.out.println(" in binary: "+Long.toBinaryString(testBases));
-//
-//			fileWriter.writeLong(testBases);		//Writes a long to the file as eight bytes, high byte first.
-//
-//			countSeq++;
-//		}
-//
-//		// to view file in console: xxd -b file
-//		fileWriter.close();
-//
-//		RandomAccessFile fileReader = new RandomAccessFile(outputFile, "r");
-//		System.out.println("Seek to 8");
-//		fileReader.seek(8);
-//
-//		for(int i = 0; i < (maxCount-1); i++) {
-//			long elLong = fileReader.readLong();
-//			System.out.print("elLong: "+elLong);
-//			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
-//		}
-//		fileReader.close();		//close the fileReader
-//
-//		RandomAccessFile fileReader2 = new RandomAccessFile(outputFile, "r");
-//		System.out.println("Seek again");
-//		fileReader2.seek(0);
-//
-//		for(int i = 0; i < (maxCount-2); i++) {
-//			long elLong = fileReader2.readLong();
-//			System.out.println(", testing bases: " + ksConverter.keyToString(elLong, sequenceLength));
-//		}
-//		fileReader2.close();		//close the fileReader
-//	}
 }
+

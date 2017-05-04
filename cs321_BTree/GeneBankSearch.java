@@ -114,9 +114,9 @@ public class GeneBankSearch {
 
 		gbs.readFile();
 		
-		//gbs.traverseTree();
+		gbs.traverseTree();
 		
-		gbs.searchQueries();
+		//gbs.searchQueries();
 		
 		fileReader.close();
 
@@ -129,9 +129,12 @@ public class GeneBankSearch {
 	private static void printUsage() {
 		System.out.println(
 				"Usage:\n"
-				+ " java GeneBankSearch <btree file> <query file> [<debug level>] \n"
+				+ " java GeneBankSearch <0/1(no/with Cache)> <btree file> <query file> <cache size> \n"
+				+ " [<debug level>] \n"
+				+ " <cache> will speed up the search"
 				+ " <btree file> file that has the B-Tree data \n"
 				+ " <query file> file that has the base sequences to find \n"
+				+ " <cache size> is the size of the cache"
 				);
 		System.exit(1);
 	}
@@ -226,7 +229,6 @@ public class GeneBankSearch {
 		for(int i = 0; i <= (2*degree); i += 1) {
 			if(i <= numberOfKeys) {
 				childOffsets[i] = fileReader.readLong();
-				//TODO: this seems odd...
 				if(childOffsets[0] == 0){               //there are no children, so no key in the tree
 					return 0;
 				}
@@ -264,8 +266,8 @@ public class GeneBankSearch {
 
 		Long fileOffset = q.dequeue();
 		nodeCount++;
-		System.out.println("This is node number: " + nodeCount);
-		System.out.println("FileOffset: "+fileOffset);
+		//System.out.println("This is node number: " + nodeCount);
+		//System.out.println("FileOffset: "+fileOffset);
 
 		fileReader.seek(fileOffset);
 
@@ -285,7 +287,8 @@ public class GeneBankSearch {
 			if ( i < numberOfKeys) {
 				keys[i] = fileReader.readLong();
 				frequencies[i] = fileReader.readInt();
-				System.out.println("key: " + keys[i]);
+				//System.out.println("key: " + ksConverter.keyToString(keys[i], sequenceLength));
+				System.out.println(ksConverter.keyToString(keys[i], sequenceLength)+": "+frequencies[i]);
 			} else {
 				long junk1 = fileReader.readLong();
 				int junk2 = fileReader.readInt();
@@ -297,7 +300,7 @@ public class GeneBankSearch {
 		for(int i = 0; i <= (2*degree); i += 1) {
 			if(i <= numberOfKeys) {
 				childOffsets[i] = fileReader.readLong();
-				System.out.println("FileOffset: "+childOffsets[i]);
+				//System.out.println("FileOffset: "+childOffsets[i]);
 				if(childOffsets[0] != 0){
 					q.enqueue(childOffsets[i]);
 				}

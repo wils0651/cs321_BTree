@@ -2,9 +2,9 @@
 
 * Tyler Nicholls, Tim Wilson
 
-*Class: cs321 
-*Spring 2017
-*Due 5/4/2017
+* Class: cs321 
+* Spring 2017
+* Due 5/4/2017
 
 ## Overview
 
@@ -41,5 +41,5 @@ the cache. These tests were run with test3.gbk, with a degree of 4 and sequence 
  * with cache size 100:
  * with cache size 500:
 
-###other relevant observations
+### other relevant observations
  This was a hard project. We struggled. But we got it done.

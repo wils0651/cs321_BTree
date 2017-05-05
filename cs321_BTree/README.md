@@ -1,12 +1,10 @@
 # B Tree Project
 
-Authors
-* Tyler Nicholls
-* Tim Wilson
+* Tyler Nicholls, Tim Wilson
 
-Class: cs321 
-Spring 2017
-Due 5/4/2017
+*Class: cs321 
+*Spring 2017
+*Due 5/4/2017
 
 ## Overview
 
@@ -31,28 +29,17 @@ written as a file offset in the metadata at the completion of the B Tree.
 
 ## Improvements in time using the cache
 There were significant improvements in the speed at which the B tree was created when using
-the cache. 
+the cache. These tests were run with test3.gbk, with a degree of 4 and sequence length of 7.
 
+#### GeneBankCreate:
+ * with no cache:
+ * with cache size 100: 11 seconds
+ * with cache size 500: 57 seconds
 
-other relevant observations
- 
+#### GeneBankSearch:
+ * with no cache:
+ * with cache size 100:
+ * with cache size 500:
 
-
-### TODO:
-- [x] Parser: ignore numbers in listing of bases
-- [x] Parser: check for another ORIGIN after //
-- [x] Parser: stop parsing at end of listing of bases 
-- [x] Parser: not reading all sequences... going by twos, removing the last base
-- [x] BTree node: write to disk - design file format
-- [x] Create: metadata file
-- [x] Search: search algorithm
-- [x] Search: rebuild BTree?
-- [x] Search seems to have an error for some sequence lengths
-- [x] BTree: file offset for root is wrong
-- [x] BTree: error with file offsets for root's children
-- [x] Cache: need to implement
-- [x] debugDump - need to implement
-- [x] test4.gbk error - this test file has no DNA sequences
-- [ ] default node size, test it works
-
-
+###other relevant observations
+ This was a hard project. We struggled. But we got it done.

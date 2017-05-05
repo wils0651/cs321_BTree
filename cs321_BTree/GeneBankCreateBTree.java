@@ -111,6 +111,8 @@ public class GeneBankCreateBTree {
 
 		GeneBankCreateBTree gbcbt = new GeneBankCreateBTree(thisCache, thisCacheSize, thisDegree, thisFilename, ThisSequenceLength, thisDebugMode);
 
+		long startTime = System.currentTimeMillis();
+		
 		System.out.println("processing file...");
 		gbcbt.sendToParser(); 
 //		gbcbt.writeMetadata();
@@ -128,6 +130,11 @@ public class GeneBankCreateBTree {
 			System.out.println("Empty B Tree");
 		}
 		System.out.println("Processing Finished.");
+		if(thisDebugMode == 1){
+			long processTime = System.currentTimeMillis() - startTime;
+			long processSeconds = processTime/1000;
+			System.out.println("Process Time: "+processSeconds);
+		}
 	}
 
 

@@ -10,16 +10,15 @@ import sun.misc.Queue;
 public class GeneBankSearch {
 	//private String bTreeFilename;
 	private String queryFilename;
-	private int debugMode;
+	private static int debugMode;
 	private static int thisCache;
 	private static int cacheSize;
-	private int degree;
-	private int sequenceLength;
-	private long fileOffsetRoot;//offset of the root node
+	private static int degree;
+	private static int sequenceLength;
+	private static long fileOffsetRoot;//offset of the root node
 	private int numNodes;
 	private static RandomAccessFile fileReader;
-	private KeyStringConverter ksConverter;
-	
+	private static KeyStringConverter ksConverter;
 	private Queue<Long> q;
 	private static String bTreeFilename;
 
@@ -115,6 +114,7 @@ public class GeneBankSearch {
 
 		GeneBankSearch.readFile();
 		
+		gbs.searchQueries();
 		
 		fileReader.close();
 
@@ -127,9 +127,13 @@ public class GeneBankSearch {
 	private static void printUsage() {
 		System.out.println(
 				"Usage:\n"
-				+ " java GeneBankSearch <btree file> <query file> [<debug level>] \n"
+				+ " java GeneBankSearch <0/1(no/with Cache)> <btree file> <query file> <cache size> \n"
+				+ "\t [<debug level>] \n"
+				+ " <cache> makes the program run faster by reducing reads from disk"
 				+ " <btree file> file that has the B-Tree data \n"
 				+ " <query file> file that has the base sequences to find \n"
+				+ " <cache size> size of the cache"
+				+ " [<debug level>] Optional, 1 prints debug statements to the console"
 				);
 		System.exit(1);
 	}
@@ -149,38 +153,25 @@ public class GeneBankSearch {
         //sequence length (int), degree (int), number of nodes (int), root file offset (long)
 
         try {
-            RandomAccessFile fileReader = new RandomAccessFile(bTreeFilename, "rwd");
             GeneBankParser geneBankParser = new GeneBankParser();
 
             fileReader.seek(0);
-            long rootReadOffset = fileReader.readLong();
-            int sequenceLength = fileReader.readInt();    //length of base sequence
-            int degree = fileReader.readInt();        // the degree of the B Tree nodes
+            fileOffsetRoot = fileReader.readLong();
+            sequenceLength = fileReader.readInt();    //length of base sequence
+            degree = fileReader.readInt();        // the degree of the B Tree nodes
 
 
-            System.out.println("sequenceLength: " + sequenceLength);
+            if(debugMode == 1){System.out.println("sequenceLength: " + sequenceLength);
             System.out.println("degree: " + degree);
-            System.out.println("fileReadOffset " + rootReadOffset);
+            System.out.println("fileReadOffset " + fileOffsetRoot);}
 
-            long maxSize = (long) Math.pow(2, sequenceLength*2);
-            System.out.println(maxSize);
-            
-            for (long i = 0; i < maxSize; i++) {
-                int frequency = searchKey(i, rootReadOffset, degree);
-
-                if(frequency > 0){
-                    System.out.printf("%s: %s\n", geneBankParser.convertLongToSequence(i, 7), frequency);
-                }
-            }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     public static int searchKey(long key, long fileOffset, int degree) throws IOException {
 
-        RandomAccessFile fileReader = new RandomAccessFile(bTreeFilename, "rwd");
         fileReader.seek(fileOffset);
 
         int numberOfKeys;            //number of keys in a node
@@ -193,10 +184,13 @@ public class GeneBankSearch {
         keys = new long[numberOfKeys];
         frequencies = new int[numberOfKeys];
         childOffsets = new long[numberOfKeys + 1];
+        
+        if(debugMode == 1){System.out.println("seeking key: "+ksConverter.keyToString(key, sequenceLength)+", "+key);}
 
         for (int i = 0; i < (2 * degree - 1); i += 1) {
             if (i < numberOfKeys) {
                 keys[i] = fileReader.readLong();
+                if(debugMode == 1){System.out.println("key: "+ksConverter.keyToString(keys[i], sequenceLength)+", "+keys[i]);}
                 frequencies[i] = fileReader.readInt();
                 if (keys[i] == key) {
                     return frequencies[i];
@@ -219,8 +213,13 @@ public class GeneBankSearch {
                 return 0;
             } else if (key < keys[i]) {                 //first time we find a key its less than it should be somewhere in that child
                 return searchKey(key, childOffsets[i], degree);
-            } else if (key > keys[numberOfKeys - 1]) {                 //if its not less than any it should be in the last child
-                return searchKey(key, childOffsets[numberOfKeys], degree);
+            } else if (i == (numberOfKeys - 1) ){ 	
+            	if (key > keys[numberOfKeys - 1]) {                 //if its not less than any it should be in the last child
+            		return searchKey(key, childOffsets[numberOfKeys], degree);
+            	}
+            } else{
+            	//String seq = ksConverter.keyToString(key);
+            	if(debugMode == 1){System.out.println("Failed to find: "+ ksConverter.keyToString(key, sequenceLength));}
             }
         }
         return 0;         //I don't think it can ever get here but if it does we should return 0
@@ -240,17 +239,17 @@ public class GeneBankSearch {
 		System.out.println("Query and Frequency");
 		int totalSequences = 0;
 		
-			String testString = "TTTTTTT";
-			Long testLong = ksConverter.stringToKey(testString, sequenceLength);
-			int testFreq = searchKey(testLong, fileOffsetRoot, degree);
-			System.out.println(testString + ": " + testFreq);
+		System.out.println("degree "+degree);
+		System.out.println("fileOffsetRoot "+fileOffsetRoot);
+		System.out.println("sequenceLength "+sequenceLength);
+		
 
 		while(fileScan.hasNext()) {
-			String queryString = fileScan.nextLine();
+			String queryString = fileScan.nextLine().trim();
 			Long queryLong = ksConverter.stringToKey(queryString, sequenceLength);
 			int queryFreq = searchKey(queryLong, fileOffsetRoot, degree);
-			System.out.println(queryString + ": " + queryFreq);
-			if(queryFreq != 0) {
+			if(queryFreq > 0) {
+				System.out.println(queryString + ": " + queryFreq);
 				totalSequences += queryFreq;
 			}
 		}

@@ -20,10 +20,17 @@ public class KeyStringConverter {
 	public long stringToKey(String subsequence, int sequenceLength) throws Exception {
 		long theKey = 0;
 		subsequence = subsequence.toLowerCase();
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(subsequence);
+		sb.reverse();
+		
+		String subsequence2 = sb.toString();
+		
 		int k = sequenceLength;
 		for (int i = 1; i <= k; i += 1) {
 			//System.out.println(subsequence.substring(i, i+1));
-			long base = mapBase(subsequence.substring(i-1, i));
+			long base = mapBase(subsequence2.substring(i-1, i));
 			theKey = theKey | (base<<2*(i-1));	//setbit
 		}
 		

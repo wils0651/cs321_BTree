@@ -4,28 +4,36 @@ import java.io.IOException;
 
 public class TWTest {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		String testSequence = "actgaactg";
-		int k = 3;	//Sequence length
+		KeyStringConverter ksConverter = new KeyStringConverter();
+		
+		String testSequence = "actgact";
+		int k = 7;	//Sequence length
 		System.out.println("testSequence: "+testSequence + ", sequence length: " + k);
 
+		long key = ksConverter.stringToKey(testSequence, k);
+		System.out.println("converted to key: "+key);
+		
+		String testSeq2 = ksConverter.keyToString(key, k);
+		System.out.println("converted back to string: "+testSeq2);
+		
 		//long testKey = GeneBankCreateBTree.stringToKey(testSequence, k);
 		//System.out.println("testKey: "+Long.toBinaryString(testKey));
 		//String returnedSeq = GeneBankCreateBTree.keyToString(testKey);
 		//System.out.println("returnedSeq: " + returnedSeq);
 
 
-		//Tyler's test
-		FileInputStream file = new FileInputStream("test.txt");
-		int sequenceLength = 3;
-		Parser aparse = new Parser(file, sequenceLength);
-		while(aparse.hasMore()){
-			String s = aparse.nextSubSequence();
-			if (s.length() == sequenceLength){
-				System.out.println(s);
-			}
-		}
+//		//Tyler's test
+//		FileInputStream file = new FileInputStream("test.txt");
+//		int sequenceLength = 3;
+//		Parser aparse = new Parser(file, sequenceLength);
+//		while(aparse.hasMore()){
+//			String s = aparse.nextSubSequence();
+//			if (s.length() == sequenceLength){
+//				System.out.println(s);
+//			}
+//		}
 
 
 

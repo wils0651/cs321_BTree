@@ -4,7 +4,7 @@
 
 * Class: cs321 
 * Spring 2017
-* Due 5/4/2017
+* Due 5/5/2017
 
 ## Overview
 
@@ -26,20 +26,15 @@ the 2*t-1 keys to fit without needing to expand the node. The position of the ro
 written as a file offset in the metadata at the completion of the B Tree. 
 
 
-
 ## Improvements in time using the cache
 There were significant improvements in the speed at which the B tree was created when using
 the cache. These tests were run with test3.gbk, with a degree of 4 and sequence length of 7.
 
+
 #### GeneBankCreate:
- * with no cache:
+ * with no cache: 2740 seconds (46 minutes)
  * with cache size 100: 11 seconds
  * with cache size 500: 57 seconds
-
-#### GeneBankSearch:
- * with no cache:
- * with cache size 100:
- * with cache size 500:
 
 ### other relevant observations
  This was a hard project. We struggled. But we got it done.

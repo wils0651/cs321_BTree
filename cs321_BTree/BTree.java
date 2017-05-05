@@ -446,7 +446,6 @@ public class BTree {
         //				fileReader.seek(fileOffset);
         //				fileReader.writeInt(keySize);	// the number of keys in the long
         //			} catch (IOException e) {
-        //				// TODO Auto-generated catch block
         //				e.printStackTrace();
         //
         //			}
@@ -458,7 +457,6 @@ public class BTree {
          * @throws IOException
          */
         public void writeToFile(BTreeNode node) throws IOException {
-            // TODO design file format
             //root file offset (long), sequence length (int), degree (int), number of nodes (int)
             //String theFilename = "theTestFile.txt";
             //File outputFile = new File(theFilename);
@@ -471,7 +469,6 @@ public class BTree {
         }
 
         public void writeNode() throws IOException {
-            // TODO design file format
             //root file offset (long), sequence length (int), degree (int), number of nodes (int)
             //String theFilename = "theTestFile.txt";
             //File outputFile = new File(theFilename);

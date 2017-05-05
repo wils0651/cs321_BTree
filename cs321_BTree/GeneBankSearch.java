@@ -93,7 +93,6 @@ public class GeneBankSearch {
 
 		int thisDebugMode = 0;
 		if (args.length == 5 && thisCache == 0) {
-			//TODO: change if another Debug level is added
 			cacheSize = 0;
 			thisDebugMode = Integer.parseInt(args[4]);
 			if(!(thisDebugMode == 0 || thisDebugMode == 1)) {
@@ -257,5 +256,8 @@ public class GeneBankSearch {
 		fileScan.close();
 		System.out.println("Total Sequences found: "+totalSequences);
 	}
+	
+	
+	
 
 }

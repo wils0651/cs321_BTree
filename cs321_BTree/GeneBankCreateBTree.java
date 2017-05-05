@@ -204,13 +204,10 @@ public class GeneBankCreateBTree {
 	 * sets the default size of the B Trees
 	 */
 	private static int bTreeDefaultSize() {
-		//TODO: check this to see if it matches what we do
 		int sizeHeader = 4 + 4 + 4 + 8;	//bytes
 		int sizeObject = 8 + 4;	//bytes, (2t-1)
 		int sizeChild  = 8;		//bytes, (2t)
-		//int sizeParent = 4;		//bytes
 		int sizeBlock  = 4096;	//bytes, size of block on disk
-		//int numObjects = (sizeBlock - sizeParent + sizeObject - sizeHeader)/(2*sizeChild + 2*sizeObject);
 		int numObjects = (sizeBlock + sizeObject - sizeHeader)/(2*sizeChild + 2*sizeObject);
 		return numObjects;
 	}
